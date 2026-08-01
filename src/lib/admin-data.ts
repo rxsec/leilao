@@ -7,6 +7,7 @@ export type AdminCategory = {
   id: string;
   name: string;
   slug: string;
+  activeLots: number;
 };
 
 export type AdminLot = {
@@ -51,7 +52,7 @@ export async function getAdminPanelData() {
   const [categories, lots]: [AdminCategory[], AdminLotRecord[]] = await Promise.all([
     prisma.category.findMany({
       orderBy: { name: "asc" },
-      select: { id: true, name: true, slug: true },
+      select: { id: true, name: true, slug: true, activeLots: true },
     }),
     prisma.lot.findMany({
       orderBy: { createdAt: "desc" },

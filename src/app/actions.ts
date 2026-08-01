@@ -423,6 +423,70 @@ export async function saveLot(
   };
 }
 
+export async function saveCategory(
+  _previousState: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const user = await getCurrentUser();
+
+  if (!user || user.role !== "admin") {
+    return { status: "error", message: "Acesso restrito ao administrador." };
+  }
+
+  const categoryId = nullableString(formData.get("categoryId"));
+  const name = String(formData.get("name") ?? "").trim();
+  const slug = String(formData.get("slug") ?? "").trim();
+
+  if (!name || !slug) {
+    return {
+      status: "error",
+      message: "Preencha nome e slug da categoria.",
+    };
+  }
+
+  try {
+    if (categoryId) {
+      await prisma.category.update({
+        where: { id: categoryId },
+        data: {
+          name,
+          slug,
+        },
+      });
+    } else {
+      await prisma.category.create({
+        data: {
+          name,
+          slug,
+        },
+      });
+    }
+
+    await recalculateCategoryCounts();
+  } catch (error) {
+    if (isUniqueConstraintError(error)) {
+      return {
+        status: "error",
+        message: "Ja existe uma categoria com este slug.",
+      };
+    }
+
+    return {
+      status: "error",
+      message: "Nao foi possivel salvar a categoria.",
+    };
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/leiloes");
+  revalidatePath("/");
+
+  return {
+    status: "success",
+    message: "Categoria salva com sucesso.",
+  };
+}
+
 export async function closeLot(
   _previousState: FormState,
   formData: FormData,
