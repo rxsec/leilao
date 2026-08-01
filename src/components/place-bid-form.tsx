@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useMemo, useState } from "react";
 import { initialFormState } from "@/app/action-states";
 import { placeBid } from "@/app/actions";
 
@@ -17,26 +17,44 @@ export function PlaceBidForm({
     placeBid,
     initialFormState,
   );
+  const [displayAmount, setDisplayAmount] = useState("");
+
+  const minimumBidLabel = useMemo(
+    () =>
+      formatCurrency(minimumBid + 1),
+    [minimumBid],
+  );
+  const normalizedAmount = useMemo(
+    () => normalizeCurrencyInput(displayAmount),
+    [displayAmount],
+  );
 
   return (
     <form action={formAction} className="space-y-4">
       <input type="hidden" name="lotSlug" value={lotSlug} />
+      <input type="hidden" name="amount" value={normalizedAmount} />
 
       <div className="space-y-2">
         <label className="block text-sm font-semibold text-neutral-900">
           Valor do lance
         </label>
         <input
-          type="number"
-          name="amount"
-          min={Math.ceil(minimumBid + 1)}
-          step="0.01"
-          placeholder={`Minimo ${new Intl.NumberFormat("pt-BR", {
-            style: "currency",
-            currency: "BRL",
-          }).format(minimumBid + 1)}`}
+          type="text"
+          inputMode="decimal"
+          placeholder={`Minimo ${minimumBidLabel}`}
           disabled={!enabled || isPending}
           required
+          value={displayAmount}
+          onChange={(event) => {
+            setDisplayAmount(event.target.value);
+          }}
+          onBlur={() => {
+            const parsedAmount = parseCurrencyInput(displayAmount);
+
+            if (parsedAmount !== null) {
+              setDisplayAmount(formatCurrency(parsedAmount));
+            }
+          }}
           className="h-12 w-full rounded-xl border border-[#d5e0e8] bg-white px-4 text-sm text-neutral-900 outline-none transition focus:border-[#0f5d86]"
         />
       </div>
@@ -66,4 +84,45 @@ export function PlaceBidForm({
       ) : null}
     </form>
   );
+}
+
+function parseCurrencyInput(value: string) {
+  const sanitized = value.replace(/[^\d,.]/g, "").trim();
+
+  if (!sanitized) {
+    return null;
+  }
+
+  const lastComma = sanitized.lastIndexOf(",");
+  const lastDot = sanitized.lastIndexOf(".");
+  const separatorIndex = Math.max(lastComma, lastDot);
+
+  if (separatorIndex === -1) {
+    const integerValue = Number(sanitized.replace(/\D/g, ""));
+    return Number.isFinite(integerValue) ? integerValue : null;
+  }
+
+  const integerPart = sanitized
+    .slice(0, separatorIndex)
+    .replace(/[^\d]/g, "");
+  const decimalPart = sanitized
+    .slice(separatorIndex + 1)
+    .replace(/[^\d]/g, "");
+  const normalized = `${integerPart || "0"}.${decimalPart}`;
+  const amount = Number(normalized);
+
+  return Number.isFinite(amount) ? amount : null;
+}
+
+function normalizeCurrencyInput(value: string) {
+  const amount = parseCurrencyInput(value);
+
+  return amount === null ? "" : amount.toFixed(2);
+}
+
+function formatCurrency(value: number) {
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(value);
 }

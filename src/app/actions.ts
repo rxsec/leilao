@@ -168,8 +168,8 @@ export async function placeBid(
 ): Promise<FormState> {
   const user = await getCurrentUser();
   const lotSlug = String(formData.get("lotSlug") ?? "").trim();
-  const amountRaw = String(formData.get("amount") ?? "").trim().replace(",", ".");
-  const amount = Number(amountRaw);
+  const amountRaw = String(formData.get("amount") ?? "").trim();
+  const amount = parseCurrencyInput(amountRaw);
 
   if (!user) {
     return {
@@ -269,6 +269,31 @@ export async function placeBid(
     status: "success",
     message: "Lance registrado com sucesso.",
   };
+}
+
+function parseCurrencyInput(value: string) {
+  const sanitized = value.replace(/[^\d,.]/g, "").trim();
+
+  if (!sanitized) {
+    return Number.NaN;
+  }
+
+  const lastComma = sanitized.lastIndexOf(",");
+  const lastDot = sanitized.lastIndexOf(".");
+  const separatorIndex = Math.max(lastComma, lastDot);
+
+  if (separatorIndex === -1) {
+    return Number(sanitized.replace(/\D/g, ""));
+  }
+
+  const integerPart = sanitized
+    .slice(0, separatorIndex)
+    .replace(/[^\d]/g, "");
+  const decimalPart = sanitized
+    .slice(separatorIndex + 1)
+    .replace(/[^\d]/g, "");
+
+  return Number(`${integerPart || "0"}.${decimalPart}`);
 }
 
 export async function saveLot(
