@@ -1,0 +1,62 @@
+import type { LotStatus, LotType } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
+
+export type AdminCategory = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
+export type AdminLot = {
+  id: string;
+  categoryId: string | null;
+  title: string;
+  slug: string;
+  description: string | null;
+  type: LotType;
+  status: LotStatus;
+  city: string | null;
+  state: string | null;
+  current_bid: number;
+  min_increment: number;
+  reserve_price: number | null;
+  buy_now_price: number | null;
+  image_url: string | null;
+  is_featured: boolean;
+  ends_at: string | null;
+};
+
+export async function getAdminPanelData() {
+  const [categories, lots] = await Promise.all([
+    prisma.category.findMany({
+      orderBy: { name: "asc" },
+      select: { id: true, name: true, slug: true },
+    }),
+    prisma.lot.findMany({
+      orderBy: { createdAt: "desc" },
+    }),
+  ]);
+
+  return {
+    categories,
+    lots: lots.map((lot) => ({
+      id: lot.id,
+      categoryId: lot.categoryId,
+      title: lot.title,
+      slug: lot.slug,
+      description: lot.description,
+      type: lot.type,
+      status: lot.status,
+      city: lot.city,
+      state: lot.state,
+      current_bid: Number(lot.currentBid),
+      min_increment: Number(lot.minIncrement),
+      reserve_price: lot.reservePrice ? Number(lot.reservePrice) : null,
+      buy_now_price: lot.buyNowPrice ? Number(lot.buyNowPrice) : null,
+      image_url: lot.imageUrl,
+      is_featured: lot.isFeatured,
+      ends_at: lot.endsAt ? lot.endsAt.toISOString() : null,
+    })) as AdminLot[],
+    hasDatabase: true,
+  };
+}
