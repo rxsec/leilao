@@ -43,6 +43,12 @@ export type LotDetail = {
   hasDatabase: boolean;
 };
 
+export type AuctionLotsResult = {
+  lots: AuctionLot[];
+  hasDatabase: boolean;
+  usingFallbackData: boolean;
+};
+
 type FallbackLotSeed = {
   slug: string;
   title: string;
@@ -150,7 +156,7 @@ const categoryImageBySlug: Record<string, string> = {
   outros: fallbackPremiumLots[3].image,
 };
 
-export async function getAuctionLots() {
+export async function getAuctionLots(): Promise<AuctionLotsResult> {
   const lots = await prisma.lot.findMany({
     where: { status: { in: ["live", "scheduled"] } },
     include: {

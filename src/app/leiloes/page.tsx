@@ -1,10 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Clock3, Gavel, MapPin } from "lucide-react";
-import { getAuctionLots } from "@/lib/auction-data";
+import { getAuctionLots, type AuctionLot } from "@/lib/auction-data";
 
 export default async function LeiloesPage() {
   const { lots, usingFallbackData } = await getAuctionLots();
+  const auctionLots: AuctionLot[] = lots;
 
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#eef4f8_0%,#f7f8fa_40%,#f8f5ef_100%)] px-4 py-8 sm:px-6 lg:px-10">
@@ -29,7 +30,7 @@ export default async function LeiloesPage() {
         </div>
 
         <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {lots.map((lot) => (
+          {auctionLots.map((lot: AuctionLot) => (
             <article
               key={lot.slug}
               className="section-card overflow-hidden rounded-[1.2rem]"
