@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Manrope, Sora } from "next/font/google";
 import "./globals.css";
-import { SiteHeader } from "@/components/site-header";
 import { siteConfig } from "@/lib/branding";
 
 const sora = Sora({
@@ -29,10 +28,7 @@ export default function RootLayout({
       lang="pt-BR"
       className={`${sora.variable} ${manrope.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        <SiteHeader />
-        {children}
-      </body>
+      <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
 }
