@@ -4,6 +4,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 import bcrypt from "bcryptjs";
+import type { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { FormState } from "@/app/action-states";
@@ -185,7 +186,7 @@ export async function placeBid(
   }
 
   try {
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const lot = await tx.lot.findUnique({ where: { slug: lotSlug } });
 
       if (!lot) {
@@ -412,7 +413,7 @@ export async function closeLot(
   }
 
   try {
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const lot = await tx.lot.findUnique({
         where: { slug: lotSlug },
         include: {
