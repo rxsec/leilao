@@ -527,21 +527,19 @@ async function recalculateCategoryCounts() {
     select: { id: true },
   });
 
-  await Promise.all(
-    categories.map(async (category: { id: string }) => {
-      const activeLots = await prisma.lot.count({
-        where: {
-          categoryId: category.id,
-          status: "live",
-        },
-      });
+  for (const category of categories) {
+    const activeLots = await prisma.lot.count({
+      where: {
+        categoryId: category.id,
+        status: "live",
+      },
+    });
 
-      await prisma.category.update({
-        where: { id: category.id },
-        data: { activeLots },
-      });
-    }),
-  );
+    await prisma.category.update({
+      where: { id: category.id },
+      data: { activeLots },
+    });
+  }
 }
 
 function nullableNumber(value: FormDataEntryValue | null) {
