@@ -1,5 +1,7 @@
-import type { LotStatus, LotType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+
+type LotType = "property" | "electronics" | "luxury" | "other";
+type LotStatus = "draft" | "scheduled" | "live" | "closed";
 
 export type AdminCategory = {
   id: string;
