@@ -3,7 +3,11 @@ import Link from "next/link";
 import { Clock3, Gavel, MapPin } from "lucide-react";
 import { notFound } from "next/navigation";
 import { PlaceBidForm } from "@/components/place-bid-form";
-import { getLotDetail } from "@/lib/auction-data";
+import {
+  getLotDetail,
+  type AuctionLot,
+  type BidHistoryItem,
+} from "@/lib/auction-data";
 
 export default async function LotDetailPage({
   params,
@@ -124,7 +128,7 @@ export default async function LotDetailPage({
               </h2>
               <div className="mt-5 space-y-3">
                 {bidHistory.length > 0 ? (
-                  bidHistory.map((bid) => (
+                  bidHistory.map((bid: BidHistoryItem) => (
                     <div
                       key={bid.id}
                       className="rounded-xl border border-[#d5e0e8] bg-white px-4 py-3"
@@ -164,7 +168,7 @@ export default async function LotDetailPage({
             </div>
 
             <div className="mt-5 grid gap-5 md:grid-cols-3">
-              {relatedLots.map((relatedLot) => (
+              {relatedLots.map((relatedLot: AuctionLot) => (
                 <Link
                   key={relatedLot.slug}
                   href={`/leiloes/${relatedLot.slug}`}

@@ -1,6 +1,6 @@
 import { AdminLotForm } from "@/components/admin-lot-form";
 import { CloseLotForm } from "@/components/close-lot-form";
-import { getAdminPanelData } from "@/lib/admin-data";
+import { getAdminPanelData, type AdminLot } from "@/lib/admin-data";
 import { requireAdmin } from "@/lib/auth";
 
 export default async function AdminPage() {
@@ -42,7 +42,7 @@ export default async function AdminPage() {
           </section>
 
           <section className="space-y-5">
-            {lots.map((lot) => (
+            {lots.map((lot: AdminLot) => (
               <div
                 key={lot.id}
                 className="section-card rounded-[1.3rem] p-6"

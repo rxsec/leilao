@@ -38,6 +38,25 @@ export type HomeData = {
   usingFallbackData: boolean;
 };
 
+type HomeCategoryRecord = {
+  name: string;
+  slug: string;
+  activeLots: number;
+};
+
+type HomeLotRecord = {
+  slug: string;
+  title: string;
+  description: string | null;
+  type: "property" | "electronics" | "luxury" | "other";
+  city: string | null;
+  state: string | null;
+  currentBid: { toString(): string };
+  bidCount: number;
+  imageUrl: string | null;
+  endsAt: Date | null;
+};
+
 const categoryImages: Record<string, string> = {
   imoveis: "/reference-assets/property-terreno.png",
   eletronicos: "/reference-assets/cat-notebook.png",
@@ -60,7 +79,7 @@ const premiumImagesByTitle: Record<string, string> = {
 };
 
 export async function getHomeData(): Promise<HomeData> {
-  const [categories, lots] = await Promise.all([
+  const [categories, lots]: [HomeCategoryRecord[], HomeLotRecord[]] = await Promise.all([
     prisma.category.findMany({
       orderBy: { activeLots: "desc" },
       take: 7,
@@ -82,7 +101,7 @@ export async function getHomeData(): Promise<HomeData> {
     };
   }
 
-  const spotlightCategories = categories.map((category) => ({
+  const spotlightCategories = categories.map((category: HomeCategoryRecord) => ({
     name: category.name,
     lots: category.activeLots,
     image: categoryImages[category.slug] ?? "/reference-assets/item-luxos.png",
@@ -91,7 +110,7 @@ export async function getHomeData(): Promise<HomeData> {
   const propertyLots = lots
     .filter((lot) => lot.type === "property")
     .slice(0, 2)
-    .map((lot, index) => ({
+    .map((lot: HomeLotRecord, index: number) => ({
       slug: lot.slug,
       tag: index === 0 ? "Destaque" : "Popular",
       title: lot.title,
@@ -109,7 +128,7 @@ export async function getHomeData(): Promise<HomeData> {
   const premiumLots = lots
     .filter((lot) => lot.type !== "property")
     .slice(0, 4)
-    .map((lot) => ({
+    .map((lot: HomeLotRecord) => ({
       slug: lot.slug,
       title: lot.title,
       lots: 1,

@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { PayOrderForm } from "@/components/pay-order-form";
 import { requireUser } from "@/lib/auth";
-import { getUserDashboardData } from "@/lib/account-data";
+import {
+  getUserDashboardData,
+  type UserBidItem,
+  type UserOrderItem,
+} from "@/lib/account-data";
 
 export default async function MeusLancesPage() {
   const user = await requireUser();
@@ -39,7 +43,7 @@ export default async function MeusLancesPage() {
             </h2>
             <div className="mt-5 space-y-3">
               {bids.length > 0 ? (
-                bids.map((bid) => (
+                bids.map((bid: UserBidItem) => (
                   <div
                     key={bid.bidId}
                     className="rounded-xl border border-[#d5e0e8] bg-white px-4 py-4"
@@ -98,7 +102,7 @@ export default async function MeusLancesPage() {
             </h2>
             <div className="mt-5 space-y-4">
               {orders.length > 0 ? (
-                orders.map((order) => (
+                orders.map((order: UserOrderItem) => (
                   <div
                     key={order.orderId}
                     className="rounded-xl border border-[#d5e0e8] bg-white px-4 py-4"

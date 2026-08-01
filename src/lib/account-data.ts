@@ -24,8 +24,35 @@ export type UserOrderItem = {
   paidAtLabel: string | null;
 };
 
+type DashboardBidRecord = {
+  id: string;
+  amount: { toString(): string };
+  createdAt: Date;
+  lot: {
+    id: string;
+    slug: string;
+    title: string;
+    status: string;
+    currentBid: { toString(): string };
+    winnerUserId: string | null;
+  };
+};
+
+type DashboardOrderRecord = {
+  id: string;
+  amount: { toString(): string };
+  status: "pending" | "paid" | "cancelled";
+  createdAt: Date;
+  paidAt: Date | null;
+  lot: {
+    slug: string;
+    title: string;
+  };
+};
+
 export async function getUserDashboardData(userId: string) {
-  const [bids, orders] = await Promise.all([
+  const [bids, orders]: [DashboardBidRecord[], DashboardOrderRecord[]] =
+    await Promise.all([
     prisma.bid.findMany({
       where: { userId },
       include: {
@@ -54,10 +81,10 @@ export async function getUserDashboardData(userId: string) {
       },
       orderBy: { createdAt: "desc" },
     }),
-  ]);
+    ]);
 
   return {
-    bids: bids.map((bid) => ({
+    bids: bids.map((bid: DashboardBidRecord) => ({
       bidId: bid.id,
       lotId: bid.lot.id,
       lotSlug: bid.lot.slug,
@@ -69,7 +96,7 @@ export async function getUserDashboardData(userId: string) {
       currentBid: formatCurrency(Number(bid.lot.currentBid)),
       isWinning: bid.lot.winnerUserId === userId,
     })) as UserBidItem[],
-    orders: orders.map((order) => ({
+    orders: orders.map((order: DashboardOrderRecord) => ({
       orderId: order.id,
       lotSlug: order.lot.slug,
       lotTitle: order.lot.title,

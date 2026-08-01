@@ -26,8 +26,27 @@ export type AdminLot = {
   ends_at: string | null;
 };
 
+type AdminLotRecord = {
+  id: string;
+  categoryId: string | null;
+  title: string;
+  slug: string;
+  description: string | null;
+  type: LotType;
+  status: LotStatus;
+  city: string | null;
+  state: string | null;
+  currentBid: { toString(): string };
+  minIncrement: { toString(): string };
+  reservePrice: { toString(): string } | null;
+  buyNowPrice: { toString(): string } | null;
+  imageUrl: string | null;
+  isFeatured: boolean;
+  endsAt: Date | null;
+};
+
 export async function getAdminPanelData() {
-  const [categories, lots] = await Promise.all([
+  const [categories, lots]: [AdminCategory[], AdminLotRecord[]] = await Promise.all([
     prisma.category.findMany({
       orderBy: { name: "asc" },
       select: { id: true, name: true, slug: true },
@@ -39,7 +58,7 @@ export async function getAdminPanelData() {
 
   return {
     categories,
-    lots: lots.map((lot) => ({
+    lots: lots.map((lot: AdminLotRecord) => ({
       id: lot.id,
       categoryId: lot.categoryId,
       title: lot.title,
