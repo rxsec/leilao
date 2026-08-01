@@ -523,12 +523,12 @@ async function storeUploadedImage(file: File) {
 }
 
 async function recalculateCategoryCounts() {
-  const categories = await prisma.category.findMany({
+  const categories: Array<{ id: string }> = await prisma.category.findMany({
     select: { id: true },
   });
 
   await Promise.all(
-    categories.map(async (category) => {
+    categories.map(async (category: { id: string }) => {
       const activeLots = await prisma.lot.count({
         where: {
           categoryId: category.id,
