@@ -74,6 +74,8 @@ export async function registerUser(
     };
   }
 
+  let redirectPath = "/meus-lances";
+
   try {
     const totalUsers = await prisma.appUser.count();
     const passwordHash = await bcrypt.hash(password, 10);
@@ -94,6 +96,7 @@ export async function registerUser(
 
     const token = await createSessionToken(user);
     await persistSessionToken(token);
+    redirectPath = getPostLoginPath(user.role);
   } catch (error) {
     if (isUniqueConstraintError(error)) {
       return {
@@ -109,7 +112,7 @@ export async function registerUser(
   }
 
   revalidatePath("/");
-  redirect("/meus-lances");
+  redirect(redirectPath);
 }
 
 export async function loginUser(
@@ -153,7 +156,7 @@ export async function loginUser(
 
   await persistSessionToken(token);
   revalidatePath("/");
-  redirect("/meus-lances");
+  redirect(getPostLoginPath(user.role));
 }
 
 export async function requestPasswordReset(
@@ -875,4 +878,8 @@ function isUniqueConstraintError(error: unknown) {
     "code" in error &&
     error.code === "P2002"
   );
+}
+
+function getPostLoginPath(role: "admin" | "customer") {
+  return role === "admin" ? "/admin" : "/meus-lances";
 }

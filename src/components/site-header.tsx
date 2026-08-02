@@ -97,10 +97,10 @@ export async function SiteHeader() {
                   {user.name}
                 </span>
                 <Link
-                  href="/meus-lances"
+                  href={user.role === "admin" ? "/admin" : "/meus-lances"}
                   className="flex h-11 items-center justify-center rounded-2xl border border-[#0f5d86]/18 bg-white px-4 text-sm font-semibold text-[#0f5d86] transition hover:bg-[#eef5fa]"
                 >
-                  Minha conta
+                  {user.role === "admin" ? "Painel admin" : "Minha conta"}
                 </Link>
                 <form action={logoutUser}>
                   <button
