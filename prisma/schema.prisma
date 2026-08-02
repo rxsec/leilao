@@ -31,6 +31,11 @@ enum OrderStatus {
   cancelled
 }
 
+enum PasswordResetStatus {
+  pending
+  resolved
+}
+
 model AppUser {
   id           String   @id @default(uuid()) @db.Uuid
   name         String
@@ -43,6 +48,17 @@ model AppUser {
   wonLots      Lot[]    @relation("LotWinner")
 
   @@map("app_users")
+}
+
+model PasswordResetRequest {
+  id         String              @id @default(uuid()) @db.Uuid
+  email      String
+  note       String?
+  status     PasswordResetStatus @default(pending)
+  createdAt  DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  resolvedAt DateTime?           @map("resolved_at") @db.Timestamptz(6)
+
+  @@map("password_reset_requests")
 }
 
 model Category {

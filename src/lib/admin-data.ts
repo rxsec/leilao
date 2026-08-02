@@ -29,6 +29,15 @@ export type AdminLot = {
   ends_at: string | null;
 };
 
+export type AdminPasswordResetRequest = {
+  id: string;
+  email: string;
+  note: string | null;
+  status: "pending" | "resolved";
+  created_at: string;
+  resolved_at: string | null;
+};
+
 type AdminLotRecord = {
   id: string;
   categoryId: string | null;
@@ -48,14 +57,31 @@ type AdminLotRecord = {
   endsAt: Date | null;
 };
 
+type AdminPasswordResetRecord = {
+  id: string;
+  email: string;
+  note: string | null;
+  status: "pending" | "resolved";
+  createdAt: Date;
+  resolvedAt: Date | null;
+};
+
 export async function getAdminPanelData() {
-  const [categories, lots]: [AdminCategory[], AdminLotRecord[]] = await Promise.all([
+  const [categories, lots, passwordResetRequests]: [
+    AdminCategory[],
+    AdminLotRecord[],
+    AdminPasswordResetRecord[],
+  ] = await Promise.all([
     prisma.category.findMany({
       orderBy: { name: "asc" },
       select: { id: true, name: true, slug: true, activeLots: true },
     }),
     prisma.lot.findMany({
       orderBy: { createdAt: "desc" },
+    }),
+    prisma.passwordResetRequest.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 20,
     }),
   ]);
 
@@ -79,6 +105,16 @@ export async function getAdminPanelData() {
       is_featured: lot.isFeatured,
       ends_at: lot.endsAt ? lot.endsAt.toISOString() : null,
     })) as AdminLot[],
+    passwordResetRequests: passwordResetRequests.map(
+      (request: AdminPasswordResetRecord) => ({
+        id: request.id,
+        email: request.email,
+        note: request.note,
+        status: request.status,
+        created_at: request.createdAt.toISOString(),
+        resolved_at: request.resolvedAt ? request.resolvedAt.toISOString() : null,
+      }),
+    ) as AdminPasswordResetRequest[],
     hasDatabase: true,
   };
 }

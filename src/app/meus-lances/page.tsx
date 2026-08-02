@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ChangePasswordForm } from "@/components/change-password-form";
 import { PayOrderForm } from "@/components/pay-order-form";
 import { requireUser } from "@/lib/auth";
 import {
@@ -22,7 +23,7 @@ export default async function MeusLancesPage() {
             {user.name}, acompanhe seus lances
           </h1>
           <p className="mt-3 max-w-[42rem] text-sm leading-7 text-white/80">
-            Veja sua posicao nos lotes e conclua o pagamento quando houver um
+            Veja sua posição nos lotes e conclua o pagamento quando houver um
             arremate confirmado.
           </p>
           {!hasDatabase ? (
@@ -39,7 +40,7 @@ export default async function MeusLancesPage() {
               Meus lances
             </p>
             <h2 className="mt-3 text-[1.9rem] font-extrabold tracking-[-0.04em] text-neutral-950">
-              Historico de participacao
+              Histórico de participação
             </h2>
             <div className="mt-5 space-y-3">
               {bids.length > 0 ? (
@@ -87,59 +88,77 @@ export default async function MeusLancesPage() {
                 ))
               ) : (
                 <p className="text-sm text-neutral-500">
-                  Voce ainda nao participou de nenhum lote.
+                  Você ainda não participou de nenhum lote.
                 </p>
               )}
             </div>
           </section>
 
-          <section className="section-card rounded-[1.3rem] p-6">
-            <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#0f5d86]">
-              Checkout
-            </p>
-            <h2 className="mt-3 text-[1.9rem] font-extrabold tracking-[-0.04em] text-neutral-950">
-              Pedidos pos-arremate
-            </h2>
-            <div className="mt-5 space-y-4">
-              {orders.length > 0 ? (
-                orders.map((order: UserOrderItem) => (
-                  <div
-                    key={order.orderId}
-                    className="rounded-xl border border-[#d5e0e8] bg-white px-4 py-4"
-                  >
-                    <p className="font-extrabold text-neutral-950">
-                      {order.lotTitle}
-                    </p>
-                    <p className="mt-1 text-sm text-neutral-500">
-                      Criado em {order.createdAtLabel}
-                    </p>
-                    <p className="mt-3 text-xl font-extrabold text-[#0f5d86]">
-                      {order.amount}
-                    </p>
-                    <div className="mt-3 flex flex-wrap items-center gap-3">
-                      <span className="rounded-full border border-[#d5e0e8] bg-[#f8fbfd] px-3 py-1 text-xs font-semibold uppercase text-neutral-600">
-                        {order.status}
-                      </span>
-                      {order.status === "paid" && order.paidAtLabel ? (
-                        <span className="text-xs text-neutral-500">
-                          Pago em {order.paidAtLabel}
+          <div className="space-y-6">
+            <section className="section-card rounded-[1.3rem] p-6">
+              <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#0f5d86]">
+                Segurança
+              </p>
+              <h2 className="mt-3 text-[1.9rem] font-extrabold tracking-[-0.04em] text-neutral-950">
+                Alterar senha
+              </h2>
+              <p className="mt-3 text-sm leading-7 text-neutral-600">
+                Atualize sua senha sempre que quiser reforçar a proteção da sua
+                conta.
+              </p>
+              <div className="mt-5">
+                <ChangePasswordForm />
+              </div>
+            </section>
+
+            <section className="section-card rounded-[1.3rem] p-6">
+              <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#0f5d86]">
+                Checkout
+              </p>
+              <h2 className="mt-3 text-[1.9rem] font-extrabold tracking-[-0.04em] text-neutral-950">
+                Pedidos pós-arremate
+              </h2>
+              <div className="mt-5 space-y-4">
+                {orders.length > 0 ? (
+                  orders.map((order: UserOrderItem) => (
+                    <div
+                      key={order.orderId}
+                      className="rounded-xl border border-[#d5e0e8] bg-white px-4 py-4"
+                    >
+                      <p className="font-extrabold text-neutral-950">
+                        {order.lotTitle}
+                      </p>
+                      <p className="mt-1 text-sm text-neutral-500">
+                        Criado em {order.createdAtLabel}
+                      </p>
+                      <p className="mt-3 text-xl font-extrabold text-[#0f5d86]">
+                        {order.amount}
+                      </p>
+                      <div className="mt-3 flex flex-wrap items-center gap-3">
+                        <span className="rounded-full border border-[#d5e0e8] bg-[#f8fbfd] px-3 py-1 text-xs font-semibold uppercase text-neutral-600">
+                          {order.status}
                         </span>
+                        {order.status === "paid" && order.paidAtLabel ? (
+                          <span className="text-xs text-neutral-500">
+                            Pago em {order.paidAtLabel}
+                          </span>
+                        ) : null}
+                      </div>
+                      {order.status === "pending" ? (
+                        <div className="mt-4">
+                          <PayOrderForm orderId={order.orderId} />
+                        </div>
                       ) : null}
                     </div>
-                    {order.status === "pending" ? (
-                      <div className="mt-4">
-                        <PayOrderForm orderId={order.orderId} />
-                      </div>
-                    ) : null}
-                  </div>
-                ))
-              ) : (
-                <p className="text-sm text-neutral-500">
-                  Nenhum pedido aguardando pagamento.
-                </p>
-              )}
-            </div>
-          </section>
+                  ))
+                ) : (
+                  <p className="text-sm text-neutral-500">
+                    Nenhum pedido aguardando pagamento.
+                  </p>
+                )}
+              </div>
+            </section>
+          </div>
         </div>
       </section>
     </main>

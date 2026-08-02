@@ -59,9 +59,20 @@ export function AuthForm({
           minLength={6}
           disabled={isPending}
           className="h-12 w-full rounded-xl border border-[#d5e0e8] bg-white px-4 text-sm text-neutral-900 outline-none transition focus:border-[#0f5d86]"
-          placeholder="Minimo de 6 caracteres"
+          placeholder="Mínimo de 6 caracteres"
         />
       </div>
+
+      {mode === "login" ? (
+        <div className="flex justify-end">
+          <Link
+            href="/recuperar-senha"
+            className="text-sm font-semibold text-[#0f5d86]"
+          >
+            Esqueci minha senha
+          </Link>
+        </div>
+      ) : null}
 
       <button
         type="submit"
@@ -88,7 +99,7 @@ export function AuthForm({
       ) : null}
 
       <p className="text-sm text-neutral-500">
-        {mode === "login" ? "Ainda nao tem conta?" : "Ja tem conta?"}{" "}
+        {mode === "login" ? "Ainda não tem conta?" : "Já tem conta?"}{" "}
         <Link
           href={mode === "login" ? "/cadastro" : "/entrar"}
           className="font-semibold text-[#0f5d86]"

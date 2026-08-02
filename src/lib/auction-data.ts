@@ -51,8 +51,19 @@ export type AuctionLotsResult = {
   usingFallbackData: boolean;
 };
 
+export type AuctionFilterOption = {
+  slug: string;
+  name: string;
+};
+
 type GetAuctionLotsOptions = {
   search?: string;
+  category?: string;
+  type?: LotType | "";
+  status?: "live" | "scheduled" | "";
+  minPrice?: number | null;
+  maxPrice?: number | null;
+  sort?: "ending" | "price-asc" | "price-desc" | "recent";
 };
 
 type FallbackLotSeed = {
@@ -166,9 +177,24 @@ export async function getAuctionLots(
   options?: GetAuctionLotsOptions,
 ): Promise<AuctionLotsResult> {
   const search = options?.search?.trim() ?? "";
+  const category = options?.category?.trim() ?? "";
+  const type = options?.type ?? "";
+  const status = options?.status ?? "";
+  const minPrice = options?.minPrice ?? null;
+  const maxPrice = options?.maxPrice ?? null;
+  const sort = options?.sort ?? "ending";
+  const defaultStatuses: Array<"live" | "scheduled"> = ["live", "scheduled"];
+  const statusFilter = status
+    ? { status: status as "live" | "scheduled" }
+    : { status: { in: defaultStatuses } };
+  const typeFilter = type ? { type } : {};
   const lots = await prisma.lot.findMany({
     where: {
-      status: { in: ["live", "scheduled"] },
+      ...statusFilter,
+      ...(category ? { category: { is: { slug: category } } } : {}),
+      ...typeFilter,
+      ...(minPrice !== null ? { currentBid: { gte: minPrice } } : {}),
+      ...(maxPrice !== null ? { currentBid: { lte: maxPrice } } : {}),
       ...(search
         ? {
             OR: [
@@ -198,7 +224,7 @@ export async function getAuctionLots(
         },
       },
     },
-    orderBy: [{ isFeatured: "desc" }, { endsAt: "asc" }],
+    orderBy: resolveLotOrder(sort),
   });
 
   if (lots.length === 0) {
@@ -214,6 +240,25 @@ export async function getAuctionLots(
     hasDatabase: true,
     usingFallbackData: false,
   };
+}
+
+export async function getAuctionFilterOptions(): Promise<AuctionFilterOption[]> {
+  const categories = await prisma.category.findMany({
+    where: {
+      lots: {
+        some: {
+          status: { in: ["live", "scheduled"] },
+        },
+      },
+    },
+    orderBy: { name: "asc" },
+    select: {
+      slug: true,
+      name: true,
+    },
+  });
+
+  return categories;
 }
 
 export async function getLotDetail(slug: string): Promise<LotDetail | null> {
@@ -392,6 +437,20 @@ function inferCategoryName(type: LotType) {
   }
 
   return "Outros";
+}
+
+function resolveLotOrder(sort: GetAuctionLotsOptions["sort"]) {
+  switch (sort) {
+    case "price-asc":
+      return [{ currentBid: "asc" as const }, { endsAt: "asc" as const }];
+    case "price-desc":
+      return [{ currentBid: "desc" as const }, { endsAt: "asc" as const }];
+    case "recent":
+      return [{ createdAt: "desc" as const }];
+    case "ending":
+    default:
+      return [{ isFeatured: "desc" as const }, { endsAt: "asc" as const }];
+  }
 }
 
 function formatCurrency(value: number) {

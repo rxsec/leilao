@@ -156,6 +156,109 @@ export async function loginUser(
   redirect("/meus-lances");
 }
 
+export async function requestPasswordReset(
+  _previousState: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const note = nullableString(formData.get("note"));
+
+  if (!email) {
+    return { status: "error", message: "Informe o e-mail da conta." };
+  }
+
+  const user = await prisma.appUser.findUnique({
+    where: { email },
+    select: { id: true },
+  });
+
+  if (!user) {
+    return {
+      status: "success",
+      message:
+        "Se existir uma conta com esse e-mail, a solicitação foi registrada para análise.",
+    };
+  }
+
+  await prisma.passwordResetRequest.create({
+    data: {
+      email,
+      note,
+      status: "pending",
+    },
+  });
+
+  revalidatePath("/admin");
+
+  return {
+    status: "success",
+    message:
+      "Solicitação enviada. O administrador poderá definir uma senha temporária para a conta.",
+  };
+}
+
+export async function changePassword(
+  _previousState: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const user = await getCurrentUser();
+  const currentPassword = String(formData.get("currentPassword") ?? "");
+  const newPassword = String(formData.get("newPassword") ?? "");
+  const confirmPassword = String(formData.get("confirmPassword") ?? "");
+
+  if (!user) {
+    return { status: "error", message: "Entre na conta para trocar a senha." };
+  }
+
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    return { status: "error", message: "Preencha todos os campos de senha." };
+  }
+
+  if (newPassword.length < 6) {
+    return {
+      status: "error",
+      message: "A nova senha precisa ter pelo menos 6 caracteres.",
+    };
+  }
+
+  if (newPassword !== confirmPassword) {
+    return { status: "error", message: "A confirmação da senha não confere." };
+  }
+
+  const account = await prisma.appUser.findUnique({
+    where: { id: user.id },
+    select: {
+      id: true,
+      passwordHash: true,
+    },
+  });
+
+  if (!account) {
+    return { status: "error", message: "Conta não encontrada." };
+  }
+
+  const passwordMatches = await bcrypt.compare(
+    currentPassword,
+    account.passwordHash,
+  );
+
+  if (!passwordMatches) {
+    return { status: "error", message: "Senha atual incorreta." };
+  }
+
+  const passwordHash = await bcrypt.hash(newPassword, 10);
+
+  await prisma.appUser.update({
+    where: { id: user.id },
+    data: { passwordHash },
+  });
+
+  return {
+    status: "success",
+    message: "Senha atualizada com sucesso.",
+  };
+}
+
 export async function logoutUser() {
   await clearSessionToken();
   revalidatePath("/");
@@ -532,6 +635,76 @@ export async function deleteCategory(
   return {
     status: "success",
     message: "Categoria excluida com sucesso.",
+  };
+}
+
+export async function resolvePasswordReset(
+  _previousState: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const user = await getCurrentUser();
+  const requestId = String(formData.get("requestId") ?? "").trim();
+  const temporaryPassword = String(formData.get("temporaryPassword") ?? "");
+
+  if (!user || user.role !== "admin") {
+    return { status: "error", message: "Acesso restrito ao administrador." };
+  }
+
+  if (!requestId || !temporaryPassword) {
+    return {
+      status: "error",
+      message: "Informe a solicitação e a senha temporária.",
+    };
+  }
+
+  if (temporaryPassword.length < 6) {
+    return {
+      status: "error",
+      message: "A senha temporária precisa ter pelo menos 6 caracteres.",
+    };
+  }
+
+  const request = await prisma.passwordResetRequest.findUnique({
+    where: { id: requestId },
+  });
+
+  if (!request) {
+    return { status: "error", message: "Solicitação não encontrada." };
+  }
+
+  const account = await prisma.appUser.findUnique({
+    where: { email: request.email },
+    select: { id: true },
+  });
+
+  if (!account) {
+    return {
+      status: "error",
+      message: "Não existe conta vinculada a esse e-mail.",
+    };
+  }
+
+  const passwordHash = await bcrypt.hash(temporaryPassword, 10);
+
+  await prisma.$transaction([
+    prisma.appUser.update({
+      where: { id: account.id },
+      data: { passwordHash },
+    }),
+    prisma.passwordResetRequest.update({
+      where: { id: requestId },
+      data: {
+        status: "resolved",
+        resolvedAt: new Date(),
+      },
+    }),
+  ]);
+
+  revalidatePath("/admin");
+
+  return {
+    status: "success",
+    message: "Senha temporária definida e solicitação concluída.",
   };
 }
 

@@ -2,16 +2,19 @@ import { AdminCategoryForm } from "@/components/admin-category-form";
 import { AdminLotForm } from "@/components/admin-lot-form";
 import { CloseLotForm } from "@/components/close-lot-form";
 import { DeleteCategoryForm } from "@/components/delete-category-form";
+import { ResolvePasswordResetForm } from "@/components/resolve-password-reset-form";
 import {
   getAdminPanelData,
   type AdminCategory,
   type AdminLot,
+  type AdminPasswordResetRequest,
 } from "@/lib/admin-data";
 import { requireAdmin } from "@/lib/auth";
 
 export default async function AdminPage() {
   await requireAdmin();
-  const { categories, lots, hasDatabase } = await getAdminPanelData();
+  const { categories, lots, passwordResetRequests, hasDatabase } =
+    await getAdminPanelData();
 
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#eef4f8_0%,#f7f8fa_38%,#f8f5ef_100%)] px-4 py-8 sm:px-6 lg:px-10">
@@ -21,11 +24,11 @@ export default async function AdminPage() {
             Admin
           </p>
           <h1 className="mt-3 text-[2.5rem] font-extrabold tracking-[-0.05em]">
-            Painel de operacao do leilao
+            Painel de operação do leilão
           </h1>
           <p className="mt-3 max-w-[44rem] text-sm leading-7 text-white/80">
-            Cadastre lotes, suba imagens, defina regras de operacao e encerre
-            leiloes para gerar pedidos de checkout.
+            Cadastre lotes, suba imagens, defina regras de operação e resolva
+            solicitações dos usuários em um só lugar.
           </p>
           {!hasDatabase ? (
             <p className="mt-4 text-sm text-[#d8edf8]">
@@ -35,6 +38,70 @@ export default async function AdminPage() {
         </div>
 
         <div className="mt-8 space-y-8">
+          <section className="section-card rounded-[1.3rem] p-6">
+            <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#0f5d86]">
+              Recuperação de senha
+            </p>
+            <h2 className="mt-3 text-[1.9rem] font-extrabold tracking-[-0.04em] text-neutral-950">
+              Solicitações dos usuários
+            </h2>
+            <div className="mt-5 space-y-4">
+              {passwordResetRequests.length > 0 ? (
+                passwordResetRequests.map(
+                  (request: AdminPasswordResetRequest) => (
+                    <div
+                      key={request.id}
+                      className="grid gap-4 rounded-[1.2rem] border border-[#d5e0e8] bg-[#f9fbfd] p-4 xl:grid-cols-[1fr_20rem]"
+                    >
+                      <div>
+                        <div className="flex flex-wrap items-center gap-3">
+                          <p className="text-lg font-extrabold text-neutral-950">
+                            {request.email}
+                          </p>
+                          <span
+                            className={`rounded-full px-3 py-1 text-xs font-semibold uppercase ${
+                              request.status === "resolved"
+                                ? "bg-[#e0f2fb] text-[#0f5d86]"
+                                : "bg-[#fff3dd] text-[#9a4d00]"
+                            }`}
+                          >
+                            {request.status === "resolved"
+                              ? "Resolvida"
+                              : "Pendente"}
+                          </span>
+                        </div>
+                        <p className="mt-2 text-sm text-neutral-500">
+                          Aberta em {formatDateTime(request.created_at)}
+                        </p>
+                        {request.resolved_at ? (
+                          <p className="mt-1 text-sm text-neutral-500">
+                            Resolvida em {formatDateTime(request.resolved_at)}
+                          </p>
+                        ) : null}
+                        {request.note ? (
+                          <p className="mt-3 rounded-xl border border-[#d5e0e8] bg-white px-4 py-3 text-sm text-neutral-600">
+                            {request.note}
+                          </p>
+                        ) : null}
+                      </div>
+
+                      <div>
+                        <ResolvePasswordResetForm
+                          requestId={request.id}
+                          disabled={request.status === "resolved"}
+                        />
+                      </div>
+                    </div>
+                  ),
+                )
+              ) : (
+                <p className="text-sm text-neutral-500">
+                  Nenhuma solicitação de recuperação recebida até agora.
+                </p>
+              )}
+            </div>
+          </section>
+
           <section className="grid gap-6 xl:grid-cols-[0.85fr_1.15fr]">
             <div className="section-card rounded-[1.3rem] p-6">
               <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#0f5d86]">
@@ -94,7 +161,7 @@ export default async function AdminPage() {
                 Novo lote
               </p>
               <h2 className="mt-3 text-[1.9rem] font-extrabold tracking-[-0.04em] text-neutral-950">
-                Cadastro rapido
+                Cadastro rápido
               </h2>
               <div className="mt-5">
                 <AdminLotForm categories={categories} />
@@ -128,7 +195,7 @@ export default async function AdminPage() {
                       value={formatCurrency(lot.current_bid)}
                     />
                     <MiniInfo
-                      label="Incremento minimo"
+                      label="Incremento mínimo"
                       value={formatCurrency(lot.min_increment)}
                     />
                     <MiniInfo
@@ -136,7 +203,7 @@ export default async function AdminPage() {
                       value={
                         lot.buy_now_price
                           ? formatCurrency(lot.buy_now_price)
-                          : "Nao definido"
+                          : "Não definido"
                       }
                     />
                   </div>
@@ -170,4 +237,11 @@ function formatCurrency(value: number) {
     style: "currency",
     currency: "BRL",
   }).format(value);
+}
+
+function formatDateTime(value: string) {
+  return new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "short",
+    timeStyle: "short",
+  }).format(new Date(value));
 }
