@@ -156,8 +156,8 @@ export default async function Home() {
 
           {usingFallbackData ? (
             <p className="mt-4 text-sm text-neutral-500">
-              Exibindo conteudo demonstrativo. Configure o banco para carregar
-              categorias e lotes reais automaticamente.
+              Enquanto o catálogo principal é montado, esta vitrine mostra itens
+              de referência para manter a navegação ativa.
             </p>
           ) : null}
 

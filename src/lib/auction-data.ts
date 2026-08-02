@@ -51,6 +51,10 @@ export type AuctionLotsResult = {
   usingFallbackData: boolean;
 };
 
+type GetAuctionLotsOptions = {
+  search?: string;
+};
+
 type FallbackLotSeed = {
   slug: string;
   title: string;
@@ -158,9 +162,34 @@ const categoryImageBySlug: Record<string, string> = {
   outros: fallbackPremiumLots[3].image,
 };
 
-export async function getAuctionLots(): Promise<AuctionLotsResult> {
+export async function getAuctionLots(
+  options?: GetAuctionLotsOptions,
+): Promise<AuctionLotsResult> {
+  const search = options?.search?.trim() ?? "";
   const lots = await prisma.lot.findMany({
-    where: { status: { in: ["live", "scheduled"] } },
+    where: {
+      status: { in: ["live", "scheduled"] },
+      ...(search
+        ? {
+            OR: [
+              { title: { contains: search, mode: "insensitive" } },
+              { description: { contains: search, mode: "insensitive" } },
+              { city: { contains: search, mode: "insensitive" } },
+              { state: { contains: search, mode: "insensitive" } },
+              {
+                category: {
+                  is: {
+                    OR: [
+                      { name: { contains: search, mode: "insensitive" } },
+                      { slug: { contains: search, mode: "insensitive" } },
+                    ],
+                  },
+                },
+              },
+            ],
+          }
+        : {}),
+    },
     include: {
       category: {
         select: {
@@ -174,9 +203,9 @@ export async function getAuctionLots(): Promise<AuctionLotsResult> {
 
   if (lots.length === 0) {
     return {
-      lots: buildFallbackLots(),
+      lots: search ? [] : buildFallbackLots(),
       hasDatabase: false,
-      usingFallbackData: true,
+      usingFallbackData: !search,
     };
   }
 

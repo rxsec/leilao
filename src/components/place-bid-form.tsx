@@ -70,7 +70,7 @@ export function PlaceBidForm({
       <p className="text-sm text-neutral-500">
         {enabled
           ? "O novo lance precisa ser maior que o valor atual e respeitar o incremento minimo."
-          : "Entre na conta e configure o Supabase para liberar o envio real de lances."}
+          : "Entre na conta e finalize a configuracao operacional para liberar o envio real de lances."}
       </p>
 
       {state.status !== "idle" ? (

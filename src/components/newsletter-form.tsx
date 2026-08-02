@@ -33,7 +33,7 @@ export function NewsletterForm({ enabled }: { enabled: boolean }) {
       <p className="text-sm text-white/78">
         {enabled
           ? "Cadastre-se para receber novos lotes e oportunidades em destaque."
-          : "A newsletter sera ativada assim que as credenciais do Supabase forem configuradas."}
+          : "A newsletter sera ativada assim que a base principal estiver pronta para receber inscricoes."}
       </p>
 
       {state.status !== "idle" ? (

@@ -76,53 +76,59 @@ export async function SiteHeader() {
         </nav>
 
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center xl:gap-4">
-          <label className="flex h-12 w-full items-center gap-3 rounded-full border border-[#d7e0e8] bg-white px-4 text-sm text-neutral-500 shadow-[0_6px_18px_rgba(15,93,134,0.06)] lg:flex-1 xl:min-w-[24rem] xl:max-w-[34rem]">
-            <Search className="h-4 w-4 text-[#8a98a6]" />
-            <input
-              className="w-full bg-transparent outline-none placeholder:text-neutral-400"
-              placeholder="Buscar por itens ou categorias..."
-            />
-          </label>
+          <form
+            action="/leiloes"
+            className="lg:flex-1 xl:min-w-[24rem] xl:max-w-[34rem]"
+          >
+            <label className="flex h-12 w-full items-center gap-3 rounded-full border border-[#d7e0e8] bg-white px-4 text-sm text-neutral-500 shadow-[0_6px_18px_rgba(15,93,134,0.06)]">
+              <Search className="h-4 w-4 text-[#8a98a6]" />
+              <input
+                name="q"
+                className="w-full bg-transparent outline-none placeholder:text-neutral-400"
+                placeholder="Buscar por itens ou categorias..."
+              />
+            </label>
+          </form>
 
           <div className="flex flex-wrap items-center gap-3">
-          {user ? (
-            <>
-              <span className="rounded-full border border-[#cfe0ea] bg-white/80 px-4 py-2 text-sm font-semibold text-[#18425d]">
-                {user.name}
-              </span>
-              <Link
-                href="/meus-lances"
-                className="flex h-11 items-center justify-center rounded-2xl border border-[#0f5d86]/18 bg-white px-4 text-sm font-semibold text-[#0f5d86] transition hover:bg-[#eef5fa]"
-              >
-                Minha conta
-              </Link>
-              <form action={logoutUser}>
-                <button
-                  type="submit"
-                  className="gold-button inline-flex h-11 items-center justify-center rounded-xl px-4 text-sm font-bold transition hover:brightness-95"
+            {user ? (
+              <>
+                <span className="rounded-full border border-[#cfe0ea] bg-white/80 px-4 py-2 text-sm font-semibold text-[#18425d]">
+                  {user.name}
+                </span>
+                <Link
+                  href="/meus-lances"
+                  className="flex h-11 items-center justify-center rounded-2xl border border-[#0f5d86]/18 bg-white px-4 text-sm font-semibold text-[#0f5d86] transition hover:bg-[#eef5fa]"
                 >
-                  Sair
-                </button>
-              </form>
-            </>
-          ) : (
-            <>
-              <Link
-                href="/entrar"
-                className="flex h-11 items-center justify-center rounded-2xl border border-[#0f5d86]/18 bg-white px-4 text-sm font-semibold text-[#0f5d86] transition hover:bg-[#eef5fa]"
-              >
-                Entrar
-              </Link>
-              <Link
-                href="/cadastro"
-                className="gold-button inline-flex h-11 items-center justify-center gap-2 rounded-xl px-4 text-sm font-bold transition hover:brightness-95"
-              >
-                <UserRound className="h-4 w-4" />
-                Criar conta
-              </Link>
-            </>
-          )}
-        </div>
+                  Minha conta
+                </Link>
+                <form action={logoutUser}>
+                  <button
+                    type="submit"
+                    className="gold-button inline-flex h-11 items-center justify-center rounded-xl px-4 text-sm font-bold transition hover:brightness-95"
+                  >
+                    Sair
+                  </button>
+                </form>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/entrar"
+                  className="flex h-11 items-center justify-center rounded-2xl border border-[#0f5d86]/18 bg-white px-4 text-sm font-semibold text-[#0f5d86] transition hover:bg-[#eef5fa]"
+                >
+                  Entrar
+                </Link>
+                <Link
+                  href="/cadastro"
+                  className="gold-button inline-flex h-11 items-center justify-center gap-2 rounded-xl px-4 text-sm font-bold transition hover:brightness-95"
+                >
+                  <UserRound className="h-4 w-4" />
+                  Criar conta
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </header>

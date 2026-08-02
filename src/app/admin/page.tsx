@@ -1,6 +1,7 @@
 import { AdminCategoryForm } from "@/components/admin-category-form";
 import { AdminLotForm } from "@/components/admin-lot-form";
 import { CloseLotForm } from "@/components/close-lot-form";
+import { DeleteCategoryForm } from "@/components/delete-category-form";
 import {
   getAdminPanelData,
   type AdminCategory,
@@ -71,6 +72,9 @@ export default async function AdminPage() {
                           label="Lotes ativos"
                           value={String(category.activeLots)}
                         />
+                      </div>
+                      <div className="mb-4">
+                        <DeleteCategoryForm categoryId={category.id} />
                       </div>
                       <AdminCategoryForm category={category} />
                     </div>

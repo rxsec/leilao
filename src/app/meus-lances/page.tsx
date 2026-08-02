@@ -27,8 +27,8 @@ export default async function MeusLancesPage() {
           </p>
           {!hasDatabase ? (
             <p className="mt-4 text-sm text-[#d8edf8]">
-              Configure o banco e aplique o schema atualizado para liberar os
-              dados reais da conta.
+              Os dados da conta aparecerao aqui assim que os primeiros lances e
+              pedidos forem registrados.
             </p>
           ) : null}
         </div>

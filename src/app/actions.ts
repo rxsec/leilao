@@ -487,6 +487,54 @@ export async function saveCategory(
   };
 }
 
+export async function deleteCategory(
+  _previousState: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const user = await getCurrentUser();
+
+  if (!user || user.role !== "admin") {
+    return { status: "error", message: "Acesso restrito ao administrador." };
+  }
+
+  const categoryId = String(formData.get("categoryId") ?? "").trim();
+
+  if (!categoryId) {
+    return { status: "error", message: "Categoria invalida." };
+  }
+
+  const lotsCount = await prisma.lot.count({
+    where: { categoryId },
+  });
+
+  if (lotsCount > 0) {
+    return {
+      status: "error",
+      message: "Remova ou troque os lotes vinculados antes de excluir a categoria.",
+    };
+  }
+
+  try {
+    await prisma.category.delete({
+      where: { id: categoryId },
+    });
+  } catch {
+    return {
+      status: "error",
+      message: "Nao foi possivel excluir a categoria.",
+    };
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/leiloes");
+  revalidatePath("/");
+
+  return {
+    status: "success",
+    message: "Categoria excluida com sucesso.",
+  };
+}
+
 export async function closeLot(
   _previousState: FormState,
   formData: FormData,
