@@ -30,21 +30,6 @@ export default async function Home() {
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#eaf1f6_0%,#f4f8fb_16%,#f7f8fa_40%)]">
       <div className="w-full">
-        <section className="bg-[#f6f8fb] pb-8 pt-6">
-          <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 text-center sm:px-6 lg:px-10">
-            <div className="inline-flex self-center rounded-full border border-[#d4e2ee] bg-white px-4 py-2 text-[0.72rem] font-bold uppercase tracking-[0.24em] text-[#0f5d86] shadow-[0_8px_24px_rgba(15,93,134,0.08)]">
-              Leilões online
-            </div>
-            <h1 className="font-display mx-auto max-w-[54rem] text-[2.2rem] font-extrabold leading-[1.04] tracking-[-0.06em] text-[#102331] sm:text-[3rem] lg:text-[4rem]">
-              Oportunidades reais em categorias selecionadas para arremate
-            </h1>
-            <p className="mx-auto max-w-[48rem] text-[0.98rem] leading-7 text-[#4d6477] sm:text-[1.04rem]">
-              Navegue pelo catálogo, acompanhe os lotes ao vivo e encontre
-              imóveis, eletrônicos, joias e artigos premium em um único lugar.
-            </p>
-          </div>
-        </section>
-
         <BannerCarousel />
 
         <section className="bg-[#f6f8fb] px-4 pb-8 sm:px-6 lg:px-10">

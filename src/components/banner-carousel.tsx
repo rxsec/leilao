@@ -23,17 +23,17 @@ export function BannerCarousel() {
   }, []);
 
   return (
-    <section className="bg-[#f6f8fb] px-4 py-7 sm:px-6 lg:px-10">
-      <div className="mx-auto max-w-[72rem]">
+    <section className="bg-[#f6f8fb] px-3 pb-7 pt-4 sm:px-5 lg:px-8">
+      <div className="mx-auto max-w-[96rem]">
         <div className="relative overflow-hidden rounded-[2rem] border border-[#d8e4ec] bg-white shadow-[0_24px_80px_rgba(15,93,134,0.12)]">
-          <div className="relative aspect-[2.85/1] min-h-[12rem] w-full sm:min-h-[16rem] lg:min-h-[20rem]">
+          <div className="relative aspect-[3.35/1] min-h-[13rem] w-full sm:min-h-[18rem] lg:min-h-[24rem] xl:min-h-[26rem]">
             <Image
               src={banners[activeIndex].src}
               alt={banners[activeIndex].alt}
               fill
               priority
               className="object-cover"
-              sizes="(max-width: 1280px) 100vw, 1152px"
+              sizes="(max-width: 1600px) 100vw, 1536px"
             />
           </div>
 
