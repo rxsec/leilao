@@ -112,6 +112,9 @@ const curatedLotGalleryBySlug: Record<string, string[]> = {
   "macbook-air-m2-13-256gb": [
     "/catalog-featured/macbook-air-m2-13-256gb.jpg",
   ],
+  "asus-vivobook-15-ryzen-5-512gb": [
+    "/catalog-featured/asus-vivobook-15-ryzen-5-512gb.jpg",
+  ],
   "pc-gamer-ryzen-5-rtx-4060-16gb": [
     "/catalog-featured/pc-gamer-ryzen-5-rtx-4060-16gb.jpg",
   ],
