@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 
 type SpotlightCategory = {
   name: string;
+  slug: string;
   lots: number;
   image: string;
 };
@@ -54,40 +55,56 @@ type HomeLotRecord = {
   currentBid: { toString(): string };
   bidCount: number;
   imageUrl: string | null;
+  images: Array<{ url: string }>;
   endsAt: Date | null;
 };
 
 const categoryImages: Record<string, string> = {
-  imoveis: "/reference-assets/property-terreno.png",
-  eletronicos: "/reference-assets/cat-notebook.png",
-  "joias-e-relogios": "/reference-assets/item-relogio.png",
-  outros: "/reference-assets/item-luxos.png",
+  celulares: "/catalog/celulares/1.jpg",
+  televisores: "/catalog/televisores/1.jpg",
+  eletrodomesticos: "/catalog/eletrodomesticos/1.jpg",
+  "ar-condicionado": "/catalog/ar-condicionado/1.jpg",
+  notebooks: "/catalog/notebooks/1.jpg",
+  "computadores-gamer": "/catalog/computadores-gamer/1.jpg",
+  outros: "/catalog/outros/1.jpg",
+  terrenos: "/catalog/terrenos/1.jpg",
+  imoveis: "/catalog/imoveis/1.jpg",
+  relogios: "/catalog/relogios/1.jpg",
+  joias: "/catalog/joias/1.jpg",
+  "artigos-de-luxo": "/catalog/artigos-de-luxo/1.jpg",
 };
 
-const lotImagesBySlug: Record<string, string> = {
-  "apartamento-3-quartos-rj": "/reference-assets/property-apartamento.png",
-  "terreno-area-nobre-sp": "/reference-assets/property-terreno.png",
-  "notebook-premium": "/reference-assets/cat-notebook.png",
-};
-
-const premiumImagesByTitle: Record<string, string> = {
-  relogio: "/reference-assets/item-relogio.png",
-  aneis: "/reference-assets/item-aneis.png",
-  corrente: "/reference-assets/item-corrente.png",
-  luxos: "/reference-assets/item-luxos.png",
-  notebook: "/reference-assets/cat-notebook.png",
-};
+const preferredCategoryOrder = [
+  "celulares",
+  "televisores",
+  "eletrodomesticos",
+  "ar-condicionado",
+  "notebooks",
+  "computadores-gamer",
+  "outros",
+  "terrenos",
+  "imoveis",
+  "relogios",
+  "joias",
+  "artigos-de-luxo",
+];
 
 export async function getHomeData(): Promise<HomeData> {
   const [categories, lots]: [HomeCategoryRecord[], HomeLotRecord[]] = await Promise.all([
     prisma.category.findMany({
-      orderBy: { activeLots: "desc" },
-      take: 7,
+      orderBy: { createdAt: "asc" },
+      take: 12,
     }),
     prisma.lot.findMany({
       where: { status: "live" },
       orderBy: [{ isFeatured: "desc" }, { endsAt: "asc" }],
       take: 12,
+      include: {
+        images: {
+          orderBy: { sortOrder: "asc" },
+          select: { url: true },
+        },
+      },
     }),
   ]);
 
@@ -103,9 +120,14 @@ export async function getHomeData(): Promise<HomeData> {
 
   const spotlightCategories = categories.map((category: HomeCategoryRecord) => ({
     name: category.name,
+    slug: category.slug,
     lots: category.activeLots,
-    image: categoryImages[category.slug] ?? "/reference-assets/item-luxos.png",
-  }));
+    image: categoryImages[category.slug] ?? "/catalog/outros/1.jpg",
+  })).sort(
+    (left, right) =>
+      preferredCategoryOrder.indexOf(left.slug) -
+      preferredCategoryOrder.indexOf(right.slug),
+  );
 
   const propertyLots = lots
     .filter((lot) => lot.type === "property")
@@ -119,10 +141,7 @@ export async function getHomeData(): Promise<HomeData> {
       price: formatCurrency(Number(lot.currentBid)),
       bids: `${lot.bidCount} ${lot.bidCount === 1 ? "lance" : "lances"}`,
       ending: formatEndsAt(lot.endsAt ? lot.endsAt.toISOString() : null),
-      image:
-        lot.imageUrl ??
-        lotImagesBySlug[lot.slug] ??
-        "/reference-assets/property-terreno.png",
+      image: lot.imageUrl ?? lot.images[0]?.url ?? "/catalog/imoveis/1.jpg",
     }));
 
   const premiumLots = lots
@@ -132,10 +151,7 @@ export async function getHomeData(): Promise<HomeData> {
       slug: lot.slug,
       title: lot.title,
       lots: 1,
-      image:
-        lot.imageUrl ??
-        resolvePremiumImage(lot.title) ??
-        "/reference-assets/item-luxos.png",
+      image: lot.imageUrl ?? lot.images[0]?.url ?? "/catalog/outros/1.jpg",
     }));
 
   return {
@@ -179,15 +195,4 @@ function formatEndsAt(value: string | null) {
   }
 
   return `Termina em ${String(hours).padStart(2, "0")}h`;
-}
-
-function resolvePremiumImage(title: string) {
-  const normalizedTitle = title
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase();
-
-  return Object.entries(premiumImagesByTitle).find(([key]) =>
-    normalizedTitle.includes(key),
-  )?.[1];
 }

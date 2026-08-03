@@ -1,7 +1,6 @@
 import {
   premiumLots as fallbackPremiumLots,
   propertyLots as fallbackPropertyLots,
-  spotlightCategories,
 } from "@/lib/branding";
 import { prisma } from "@/lib/prisma";
 
@@ -19,10 +18,12 @@ export type AuctionLot = {
   currentBidValue: number;
   bidCount: number;
   image: string;
+  images: string[];
   endsAtLabel: string;
   endsAtIso: string | null;
   status: LotStatus;
   categoryName: string;
+  categorySlug: string;
   isFeatured: boolean;
   minIncrementValue: number;
   reservePriceValue: number | null;
@@ -161,17 +162,35 @@ const fallbackLotSeeds: FallbackLotSeed[] = [
   },
 ];
 
-const categoryImageByName: Record<string, string> = Object.fromEntries(
-  spotlightCategories.map((category) => [category.name, category.image]),
-);
-
 const categoryImageBySlug: Record<string, string> = {
-  imoveis: fallbackPropertyLots[0].image,
-  eletronicos:
-    categoryImageByName["Notebook"] ?? "/reference-assets/cat-notebook.png",
-  "joias-e-relogios": fallbackPremiumLots[0].image,
-  outros: fallbackPremiumLots[3].image,
+  celulares: "/catalog/celulares/1.jpg",
+  televisores: "/catalog/televisores/1.jpg",
+  eletrodomesticos: "/catalog/eletrodomesticos/1.jpg",
+  "ar-condicionado": "/catalog/ar-condicionado/1.jpg",
+  notebooks: "/catalog/notebooks/1.jpg",
+  "computadores-gamer": "/catalog/computadores-gamer/1.jpg",
+  outros: "/catalog/outros/1.jpg",
+  terrenos: "/catalog/terrenos/1.jpg",
+  imoveis: "/catalog/imoveis/1.jpg",
+  relogios: "/catalog/relogios/1.jpg",
+  joias: "/catalog/joias/1.jpg",
+  "artigos-de-luxo": "/catalog/artigos-de-luxo/1.jpg",
 };
+
+const preferredCategoryOrder = [
+  "celulares",
+  "televisores",
+  "eletrodomesticos",
+  "ar-condicionado",
+  "notebooks",
+  "computadores-gamer",
+  "outros",
+  "terrenos",
+  "imoveis",
+  "relogios",
+  "joias",
+  "artigos-de-luxo",
+];
 
 export async function getAuctionLots(
   options?: GetAuctionLotsOptions,
@@ -223,6 +242,10 @@ export async function getAuctionLots(
           slug: true,
         },
       },
+      images: {
+        orderBy: { sortOrder: "asc" },
+        select: { url: true },
+      },
     },
     orderBy: resolveLotOrder(sort),
   });
@@ -258,7 +281,11 @@ export async function getAuctionFilterOptions(): Promise<AuctionFilterOption[]> 
     },
   });
 
-  return categories;
+  return categories.sort(
+    (left, right) =>
+      preferredCategoryOrder.indexOf(left.slug) -
+      preferredCategoryOrder.indexOf(right.slug),
+  );
 }
 
 export async function getLotDetail(slug: string): Promise<LotDetail | null> {
@@ -270,6 +297,10 @@ export async function getLotDetail(slug: string): Promise<LotDetail | null> {
           name: true,
           slug: true,
         },
+      },
+      images: {
+        orderBy: { sortOrder: "asc" },
+        select: { url: true },
       },
       bids: {
         orderBy: { createdAt: "desc" },
@@ -290,6 +321,10 @@ export async function getLotDetail(slug: string): Promise<LotDetail | null> {
           name: true,
           slug: true,
         },
+      },
+      images: {
+        orderBy: { sortOrder: "asc" },
+        select: { url: true },
       },
     },
     orderBy: [{ isFeatured: "desc" }, { endsAt: "asc" }],
@@ -330,6 +365,7 @@ function buildFallbackLots(): AuctionLot[] {
     currentBidValue: lot.currentBidValue,
     bidCount: lot.bidCount,
     image: lot.image,
+    images: [lot.image, lot.image, lot.image],
     endsAtLabel: formatEndsAt(
       new Date(Date.now() + lot.endsAtOffsetHours * 60 * 60 * 1000).toISOString(),
     ),
@@ -338,6 +374,7 @@ function buildFallbackLots(): AuctionLot[] {
     ).toISOString(),
     status: "live",
     categoryName: lot.categoryName,
+    categorySlug: slugify(lot.categoryName),
     isFeatured: lot.isFeatured,
     minIncrementValue: 100,
     reservePriceValue: null,
@@ -388,6 +425,7 @@ function mapLotRecord(lot: {
   currentBid: { toString(): string };
   bidCount: number;
   imageUrl: string | null;
+  images: Array<{ url: string }>;
   isFeatured: boolean;
   endsAt: Date | null;
   status: LotStatus;
@@ -397,6 +435,12 @@ function mapLotRecord(lot: {
   category: { name: string; slug: string } | null;
 }) {
   const categoryName = lot.category?.name ?? inferCategoryName(lot.type);
+  const gallery = lot.images.map((image) => image.url);
+  const coverImage =
+    lot.imageUrl ??
+    gallery[0] ??
+    categoryImageBySlug[lot.category?.slug ?? ""] ??
+    fallbackPremiumLots[3].image;
 
   return {
     id: lot.id,
@@ -408,14 +452,13 @@ function mapLotRecord(lot: {
     currentBid: formatCurrency(Number(lot.currentBid)),
     currentBidValue: Number(lot.currentBid),
     bidCount: lot.bidCount,
-    image:
-      lot.imageUrl ??
-      categoryImageBySlug[lot.category?.slug ?? ""] ??
-      fallbackPremiumLots[3].image,
+    image: coverImage,
+    images: gallery.length > 0 ? gallery : [coverImage],
     endsAtLabel: formatEndsAt(lot.endsAt ? lot.endsAt.toISOString() : null),
     endsAtIso: lot.endsAt ? lot.endsAt.toISOString() : null,
     status: lot.status,
     categoryName,
+    categorySlug: lot.category?.slug ?? slugify(categoryName),
     isFeatured: lot.isFeatured,
     minIncrementValue: Number(lot.minIncrement),
     reservePriceValue: lot.reservePrice ? Number(lot.reservePrice) : null,
@@ -425,15 +468,15 @@ function mapLotRecord(lot: {
 
 function inferCategoryName(type: LotType) {
   if (type === "property") {
-    return "Imoveis";
+    return "Imóveis";
   }
 
   if (type === "electronics") {
-    return "Eletronicos";
+    return "Eletrônicos";
   }
 
   if (type === "luxury") {
-    return "Joias e Relogios";
+    return "Artigo de Luxos";
   }
 
   return "Outros";
@@ -488,4 +531,12 @@ function formatDateTime(value: Date) {
     dateStyle: "short",
     timeStyle: "short",
   }).format(value);
+}
+
+function slugify(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/\s+/g, "-");
 }

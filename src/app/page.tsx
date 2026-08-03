@@ -121,13 +121,13 @@ export default async function Home() {
           <SectionHeader
             id="categorias"
             title="Categorias em Destaque"
-            action="Ver todas categorias"
+            action="Ver catálogo completo"
           />
-          <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7">
+          <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6">
             {categories.map((category) => (
               <Link
                 key={category.name}
-                href="#categorias"
+                href={`/leiloes?category=${category.slug}`}
                 className="section-card rounded-[1rem] p-3 transition hover:-translate-y-1"
               >
                 <div className="relative h-40 overflow-hidden rounded-[0.9rem] bg-white sm:h-44">

@@ -1,6 +1,10 @@
-import "dotenv/config";
+import dotenv from "dotenv";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
+import { buildCatalogSeed } from "./catalog-data.mjs";
+
+dotenv.config({ path: ".env.local" });
+dotenv.config();
 
 const connectionString = process.env.DIRECT_URL || process.env.DATABASE_URL;
 
@@ -13,21 +17,21 @@ const prisma = new PrismaClient({
 });
 
 async function main() {
-  const categories = [
-    { name: "Imoveis", slug: "imoveis", activeLots: 2 },
-    { name: "Eletronicos", slug: "eletronicos", activeLots: 1 },
-    { name: "Joias e Relogios", slug: "joias-e-relogios", activeLots: 0 },
-    { name: "Outros", slug: "outros", activeLots: 0 },
-  ];
+  const catalog = buildCatalogSeed();
 
-  for (const category of categories) {
-    await prisma.category.upsert({
-      where: { slug: category.slug },
-      update: {
+  await prisma.bid.deleteMany();
+  await prisma.order.deleteMany();
+  await prisma.lotImage.deleteMany();
+  await prisma.lot.deleteMany();
+  await prisma.category.deleteMany();
+
+  for (const category of catalog) {
+    await prisma.category.create({
+      data: {
         name: category.name,
-        activeLots: category.activeLots,
+        slug: category.slug,
+        activeLots: category.products.length,
       },
-      create: category,
     });
   }
 
@@ -37,63 +41,35 @@ async function main() {
     })).map((category) => [category.slug, category.id]),
   );
 
-  const lots = [
-    {
-      categoryId: categoryMap.imoveis,
-      title: "Apartamento 3 quartos",
-      slug: "apartamento-3-quartos-rj",
-      description: "Apartamento residencial com 3 quartos e vaga de garagem.",
-      type: "property",
-      status: "live",
-      city: "Rio de Janeiro",
-      state: "RJ",
-      currentBid: 350000,
-      bidCount: 28,
-      minIncrement: 1000,
-      isFeatured: true,
-      endsAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
-      imageUrl: "/reference-assets/property-apartamento.png",
-    },
-    {
-      categoryId: categoryMap.imoveis,
-      title: "Terreno em area nobre",
-      slug: "terreno-area-nobre-sp",
-      description: "Terreno amplo em localizacao valorizada.",
-      type: "property",
-      status: "live",
-      city: "Sao Paulo",
-      state: "SP",
-      currentBid: 120000,
-      bidCount: 12,
-      minIncrement: 1000,
-      isFeatured: true,
-      endsAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
-      imageUrl: "/reference-assets/property-terreno.png",
-    },
-    {
-      categoryId: categoryMap.eletronicos,
-      title: "Notebook premium",
-      slug: "notebook-premium",
-      description: "Notebook de alta performance com acabamento premium.",
-      type: "electronics",
-      status: "live",
-      city: "Campinas",
-      state: "SP",
-      currentBid: 4800,
-      bidCount: 15,
-      minIncrement: 100,
-      isFeatured: false,
-      endsAt: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
-      imageUrl: "/reference-assets/cat-notebook.png",
-    },
-  ];
-
-  for (const lot of lots) {
-    await prisma.lot.upsert({
-      where: { slug: lot.slug },
-      update: lot,
-      create: lot,
-    });
+  for (const category of catalog) {
+    for (const product of category.products) {
+      await prisma.lot.create({
+        data: {
+          categoryId: categoryMap[category.slug],
+          title: product.title,
+          slug: product.slug,
+          description: product.description,
+          type: category.type,
+          status: "live",
+          city: product.city,
+          state: product.state,
+          currentBid: product.openingBid,
+          bidCount: product.bidCount,
+          minIncrement: product.minIncrement,
+          reservePrice: product.auctionValue,
+          buyNowPrice: product.auctionValue,
+          imageUrl: product.imageUrl,
+          isFeatured: product.isFeatured,
+          endsAt: product.endsAt,
+          images: {
+            create: product.gallery.map((url, index) => ({
+              url,
+              sortOrder: index,
+            })),
+          },
+        },
+      });
+    }
   }
 }
 

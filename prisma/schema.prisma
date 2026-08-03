@@ -95,10 +95,22 @@ model Lot {
   createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   category      Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   bids          Bid[]
+  images        LotImage[]
   orders        Order[]
   winnerUser    AppUser?  @relation("LotWinner", fields: [winnerUserId], references: [id], onDelete: SetNull)
 
   @@map("lots")
+}
+
+model LotImage {
+  id        String   @id @default(uuid()) @db.Uuid
+  lotId     String   @map("lot_id") @db.Uuid
+  url       String
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  lot       Lot      @relation(fields: [lotId], references: [id], onDelete: Cascade)
+
+  @@map("lot_images")
 }
 
 model Bid {

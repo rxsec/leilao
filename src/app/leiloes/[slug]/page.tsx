@@ -46,6 +46,25 @@ export default async function LotDetailPage({
               />
             </div>
 
+            {lot.images.length > 1 ? (
+              <div className="grid grid-cols-3 gap-3 border-t border-[#e4edf3] bg-[#f8fbfd] p-4">
+                {lot.images.slice(0, 3).map((image, index) => (
+                  <div
+                    key={`${lot.slug}-image-${index}`}
+                    className="relative h-24 overflow-hidden rounded-xl bg-white sm:h-28"
+                  >
+                    <Image
+                      src={image}
+                      alt={`${lot.title} - imagem ${index + 1}`}
+                      fill
+                      className="object-cover"
+                      sizes="200px"
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
             <div className="space-y-5 p-6">
               <div className="flex flex-wrap items-center gap-3">
                 <span className="accent-button rounded-full px-3 py-1 text-[0.72rem] font-bold uppercase">
