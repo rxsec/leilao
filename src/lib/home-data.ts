@@ -3,7 +3,12 @@ import {
   propertyLots as fallbackPropertyLots,
   spotlightCategories as fallbackSpotlightCategories,
 } from "@/lib/branding";
-import { getCategoryImage, getLotCoverImage } from "@/lib/catalog-images";
+import {
+  featuredHomeLotSlugs,
+  featuredPremiumLotSlugs,
+  getCategoryImage,
+  getLotCoverImage,
+} from "@/lib/catalog-images";
 import { prisma } from "@/lib/prisma";
 
 type SpotlightCategory = {
@@ -135,7 +140,7 @@ export async function getHomeData(): Promise<HomeData> {
       preferredCategoryOrder.indexOf(right.slug),
   );
 
-  const activeLots = shuffleLots(lots)
+  const activeLots = sortLotsBySlugOrder(lots, featuredHomeLotSlugs)
     .slice(0, 6)
     .map((lot: HomeLotRecord) => ({
       slug: lot.slug,
@@ -151,6 +156,7 @@ export async function getHomeData(): Promise<HomeData> {
 
   const premiumLots = lots
     .filter((lot) => lot.type !== "property")
+    .sort((left, right) => compareLotSlugs(left.slug, right.slug, featuredPremiumLotSlugs))
     .slice(0, 4)
     .map((lot: HomeLotRecord) => ({
       slug: lot.slug,
@@ -182,10 +188,6 @@ export async function getHomeData(): Promise<HomeData> {
     hasDatabase: true,
     usingFallbackData: false,
   };
-}
-
-function shuffleLots(lots: HomeLotRecord[]) {
-  return [...lots].sort(() => Math.random() - 0.5);
 }
 
 function inferCategoryName(type: HomeLotRecord["type"]) {
@@ -248,4 +250,29 @@ function formatEndsAt(value: string | null) {
   }
 
   return `Termina em ${String(hours).padStart(2, "0")}h`;
+}
+
+function sortLotsBySlugOrder(lots: HomeLotRecord[], orderedSlugs: string[]) {
+  return [...lots].sort((left, right) =>
+    compareLotSlugs(left.slug, right.slug, orderedSlugs),
+  );
+}
+
+function compareLotSlugs(leftSlug: string, rightSlug: string, orderedSlugs: string[]) {
+  const leftIndex = orderedSlugs.indexOf(leftSlug);
+  const rightIndex = orderedSlugs.indexOf(rightSlug);
+
+  if (leftIndex === -1 && rightIndex === -1) {
+    return leftSlug.localeCompare(rightSlug);
+  }
+
+  if (leftIndex === -1) {
+    return 1;
+  }
+
+  if (rightIndex === -1) {
+    return -1;
+  }
+
+  return leftIndex - rightIndex;
 }

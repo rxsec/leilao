@@ -1,4 +1,4 @@
-const catalogImageBySlug: Record<string, string[]> = {
+const fallbackCategoryGallery: Record<string, string[]> = {
   celulares: [
     "/catalog/celulares/1.jpg",
     "/catalog/celulares/2.jpg",
@@ -61,23 +61,87 @@ const catalogImageBySlug: Record<string, string[]> = {
   ],
 };
 
+const curatedCategoryImageBySlug: Record<string, string> = {
+  celulares: "/catalog-featured/apple-iphone-16-128gb-white.png",
+  televisores: "/catalog-featured/samsung-smart-tv-crystal-55-4k.jpg",
+  eletrodomesticos: "/catalog-featured/geladeira-brastemp-frost-free-375l.jpg",
+  "ar-condicionado": "/catalog-featured/split-inverter-lg-dual-voice-9000-btus.jpg",
+  notebooks: "/catalog/notebooks/1.jpg",
+  "computadores-gamer": "/catalog/computadores-gamer/1.jpg",
+  outros: "/catalog-featured/camera-sony-alpha-a6400.webp",
+  terrenos: "/catalog/terrenos/1.jpg",
+  imoveis: "/catalog/imoveis/1.jpg",
+  relogios: "/catalog-featured/rolex-datejust-41-aco-e-ouro.png",
+  joias: "/catalog-featured/anel-solitario-ouro-18k-com-diamante.png",
+  "artigos-de-luxo": "/catalog-featured/bolsa-louis-vuitton-neverfull-mm.jpg",
+};
+
+const curatedLotGalleryBySlug: Record<string, string[]> = {
+  "apple-iphone-16-128gb": [
+    "/catalog-featured/apple-iphone-16-128gb-white.png",
+    "/catalog-featured/apple-iphone-16-128gb.jpg",
+    "/catalog-featured/apple-iphone-16-128gb-white.png",
+  ],
+  "samsung-smart-tv-crystal-55-4k": [
+    "/catalog-featured/samsung-smart-tv-crystal-55-4k.jpg",
+  ],
+  "geladeira-brastemp-frost-free-375l": [
+    "/catalog-featured/geladeira-brastemp-frost-free-375l.jpg",
+  ],
+  "split-inverter-lg-dual-voice-9000-btus": [
+    "/catalog-featured/split-inverter-lg-dual-voice-9000-btus.jpg",
+  ],
+  "camera-sony-alpha-a6400": [
+    "/catalog-featured/camera-sony-alpha-a6400.webp",
+  ],
+  "rolex-datejust-41-aco-e-ouro": [
+    "/catalog-featured/rolex-datejust-41-aco-e-ouro.png",
+  ],
+  "anel-solitario-ouro-18k-com-diamante": [
+    "/catalog-featured/anel-solitario-ouro-18k-com-diamante.png",
+  ],
+  "bolsa-louis-vuitton-neverfull-mm": [
+    "/catalog-featured/bolsa-louis-vuitton-neverfull-mm.jpg",
+  ],
+};
+
+export const featuredHomeLotSlugs = [
+  "apple-iphone-16-128gb",
+  "samsung-smart-tv-crystal-55-4k",
+  "geladeira-brastemp-frost-free-375l",
+  "split-inverter-lg-dual-voice-9000-btus",
+  "camera-sony-alpha-a6400",
+  "rolex-datejust-41-aco-e-ouro",
+];
+
+export const featuredPremiumLotSlugs = [
+  "apple-iphone-16-128gb",
+  "camera-sony-alpha-a6400",
+  "anel-solitario-ouro-18k-com-diamante",
+  "bolsa-louis-vuitton-neverfull-mm",
+];
+
 export function getCategoryImage(slug: string) {
-  return catalogImageBySlug[slug]?.[0] ?? "/catalog/outros/1.jpg";
+  return curatedCategoryImageBySlug[slug] ?? fallbackCategoryGallery[slug]?.[0] ?? "/catalog/outros/1.jpg";
 }
 
 export function getCategoryGallery(slug: string) {
-  return catalogImageBySlug[slug] ?? catalogImageBySlug.outros;
+  return fallbackCategoryGallery[slug] ?? fallbackCategoryGallery.outros;
 }
 
-export function getLotGallery(slug: string, lotKey: string) {
-  const gallery = getCategoryGallery(slug);
-  const startIndex = Math.abs(hashValue(lotKey)) % gallery.length;
+export function getLotGallery(categorySlug: string, lotSlug: string) {
+  if (curatedLotGalleryBySlug[lotSlug]) {
+    return curatedLotGalleryBySlug[lotSlug];
+  }
+
+  const gallery = getCategoryGallery(categorySlug);
+  const startIndex = Math.abs(hashValue(lotSlug)) % gallery.length;
 
   return gallery.map((_, index) => gallery[(startIndex + index) % gallery.length]);
 }
 
-export function getLotCoverImage(slug: string, lotKey: string) {
-  return getLotGallery(slug, lotKey)[0];
+export function getLotCoverImage(categorySlug: string, lotSlug: string) {
+  return getLotGallery(categorySlug, lotSlug)[0];
 }
 
 function hashValue(value: string) {
