@@ -2,6 +2,7 @@ import {
   premiumLots as fallbackPremiumLots,
   propertyLots as fallbackPropertyLots,
 } from "@/lib/branding";
+import { getCategoryImage, getLotGallery } from "@/lib/catalog-images";
 import { prisma } from "@/lib/prisma";
 
 type LotType = "property" | "electronics" | "luxury" | "other";
@@ -161,21 +162,6 @@ const fallbackLotSeeds: FallbackLotSeed[] = [
     isFeatured: false,
   },
 ];
-
-const categoryImageBySlug: Record<string, string> = {
-  celulares: "/catalog/celulares/1.jpg",
-  televisores: "/catalog/televisores/1.jpg",
-  eletrodomesticos: "/catalog/eletrodomesticos/1.jpg",
-  "ar-condicionado": "/catalog/ar-condicionado/1.jpg",
-  notebooks: "/catalog/notebooks/1.jpg",
-  "computadores-gamer": "/catalog/computadores-gamer/1.jpg",
-  outros: "/catalog/outros/1.jpg",
-  terrenos: "/catalog/terrenos/1.jpg",
-  imoveis: "/catalog/imoveis/1.jpg",
-  relogios: "/catalog/relogios/1.jpg",
-  joias: "/catalog/joias/1.jpg",
-  "artigos-de-luxo": "/catalog/artigos-de-luxo/1.jpg",
-};
 
 const preferredCategoryOrder = [
   "celulares",
@@ -435,12 +421,17 @@ function mapLotRecord(lot: {
   category: { name: string; slug: string } | null;
 }) {
   const categoryName = lot.category?.name ?? inferCategoryName(lot.type);
-  const gallery = lot.images.map((image) => image.url);
+  const categorySlug = lot.category?.slug ?? slugify(categoryName);
+  const defaultGallery = getLotGallery(categorySlug, lot.slug);
+  const gallery =
+    lot.images.length > 0 &&
+    !isGenericCatalogGallery(lot.images.map((image) => image.url), categorySlug)
+      ? lot.images.map((image) => image.url)
+      : defaultGallery;
   const coverImage =
-    lot.imageUrl ??
-    gallery[0] ??
-    categoryImageBySlug[lot.category?.slug ?? ""] ??
-    fallbackPremiumLots[3].image;
+    lot.imageUrl && !isGenericCatalogImage(lot.imageUrl, categorySlug)
+      ? lot.imageUrl
+      : gallery[0] ?? getCategoryImage(categorySlug) ?? fallbackPremiumLots[3].image;
 
   return {
     id: lot.id,
@@ -458,12 +449,20 @@ function mapLotRecord(lot: {
     endsAtIso: lot.endsAt ? lot.endsAt.toISOString() : null,
     status: lot.status,
     categoryName,
-    categorySlug: lot.category?.slug ?? slugify(categoryName),
+    categorySlug,
     isFeatured: lot.isFeatured,
     minIncrementValue: Number(lot.minIncrement),
     reservePriceValue: lot.reservePrice ? Number(lot.reservePrice) : null,
     buyNowPriceValue: lot.buyNowPrice ? Number(lot.buyNowPrice) : null,
   } satisfies AuctionLot;
+}
+
+function isGenericCatalogImage(url: string, categorySlug: string) {
+  return url.startsWith(`/catalog/${categorySlug}/`);
+}
+
+function isGenericCatalogGallery(urls: string[], categorySlug: string) {
+  return urls.length > 0 && urls.every((url) => isGenericCatalogImage(url, categorySlug));
 }
 
 function inferCategoryName(type: LotType) {

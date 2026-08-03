@@ -20,10 +20,10 @@ import { getHomeData } from "@/lib/home-data";
 
 export default async function Home() {
   const {
+    activeLots,
     categories,
     hasDatabase,
     premiumLots,
-    propertyLots,
     usingFallbackData,
   } = await getHomeData();
 
@@ -113,15 +113,15 @@ export default async function Home() {
 
           <SectionHeader
             id="leiloes"
-            title="Outros Imóveis"
-            action="Ver todos imóveis"
+            title="Leilões ativos"
+            action="Ver todos leilões"
             darkAction
             className="mt-10"
           />
-          <div className="mt-5 grid gap-5 xl:grid-cols-[1fr_1fr_0.95fr]">
-            {propertyLots.map((lot) => (
+          <div className="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {activeLots.map((lot) => (
               <Link
-                key={lot.title}
+                key={lot.slug}
                 href={`/leiloes/${lot.slug}`}
                 className="section-card overflow-hidden rounded-[1rem] transition hover:-translate-y-1"
               >
@@ -134,12 +134,12 @@ export default async function Home() {
                     sizes="350px"
                   />
                   <span className="accent-button absolute left-4 top-4 rounded-full px-3 py-1 text-[0.68rem] font-bold">
-                    {lot.tag}
+                    {lot.categoryName}
                   </span>
                 </div>
                 <div className="space-y-3 p-4 sm:p-5">
                   <div>
-                    <h3 className="text-[1.55rem] font-extrabold uppercase text-neutral-950">
+                    <h3 className="text-[1.35rem] font-extrabold uppercase text-neutral-950">
                       {lot.title}
                     </h3>
                     <p className="mt-1 text-sm text-neutral-500">{lot.subtitle}</p>
@@ -163,26 +163,6 @@ export default async function Home() {
                 </div>
               </Link>
             ))}
-
-            <aside className="rounded-[1rem] bg-[linear-gradient(160deg,#0b2230,#0f4f72)] p-5 text-white shadow-[0_18px_40px_rgba(15,93,134,0.18)]">
-              <div className="grid-pattern flex h-full min-h-[17rem] flex-col justify-between rounded-[0.9rem] border border-white/10 p-6 sm:min-h-[19rem]">
-                <PackageCheck className="h-11 w-11 text-[#d7eef8]" />
-                <div>
-                  <h3 className="text-[2rem] font-extrabold uppercase">
-                    Outros Imóveis
-                  </h3>
-                  <p className="mt-4 max-w-[15rem] text-base leading-7 text-white/82">
-                    Confira mais opções de imóveis disponíveis para leilão.
-                  </p>
-                  <Link
-                    href="/leiloes"
-                    className="accent-button mt-7 inline-flex h-11 items-center rounded-xl px-5 text-sm font-bold shadow-[0_10px_24px_rgba(0,0,0,0.18)] transition hover:brightness-95"
-                  >
-                    Ver todos
-                  </Link>
-                </div>
-              </div>
-            </aside>
           </div>
 
           <SectionHeader

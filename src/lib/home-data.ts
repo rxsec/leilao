@@ -3,6 +3,7 @@ import {
   propertyLots as fallbackPropertyLots,
   spotlightCategories as fallbackSpotlightCategories,
 } from "@/lib/branding";
+import { getCategoryImage, getLotCoverImage } from "@/lib/catalog-images";
 import { prisma } from "@/lib/prisma";
 
 type SpotlightCategory = {
@@ -12,9 +13,8 @@ type SpotlightCategory = {
   image: string;
 };
 
-type PropertyLot = {
+type ActiveLot = {
   slug: string;
-  tag: string;
   title: string;
   subtitle: string;
   location: string;
@@ -22,6 +22,7 @@ type PropertyLot = {
   bids: string;
   ending: string;
   image: string;
+  categoryName: string;
 };
 
 type PremiumLot = {
@@ -33,7 +34,7 @@ type PremiumLot = {
 
 export type HomeData = {
   categories: SpotlightCategory[];
-  propertyLots: PropertyLot[];
+  activeLots: ActiveLot[];
   premiumLots: PremiumLot[];
   hasDatabase: boolean;
   usingFallbackData: boolean;
@@ -57,21 +58,10 @@ type HomeLotRecord = {
   imageUrl: string | null;
   images: Array<{ url: string }>;
   endsAt: Date | null;
-};
-
-const categoryImages: Record<string, string> = {
-  celulares: "/catalog/celulares/1.jpg",
-  televisores: "/catalog/televisores/1.jpg",
-  eletrodomesticos: "/catalog/eletrodomesticos/1.jpg",
-  "ar-condicionado": "/catalog/ar-condicionado/1.jpg",
-  notebooks: "/catalog/notebooks/1.jpg",
-  "computadores-gamer": "/catalog/computadores-gamer/1.jpg",
-  outros: "/catalog/outros/1.jpg",
-  terrenos: "/catalog/terrenos/1.jpg",
-  imoveis: "/catalog/imoveis/1.jpg",
-  relogios: "/catalog/relogios/1.jpg",
-  joias: "/catalog/joias/1.jpg",
-  "artigos-de-luxo": "/catalog/artigos-de-luxo/1.jpg",
+  category: {
+    name: string;
+    slug: string;
+  } | null;
 };
 
 const preferredCategoryOrder = [
@@ -100,6 +90,12 @@ export async function getHomeData(): Promise<HomeData> {
       orderBy: [{ isFeatured: "desc" }, { endsAt: "asc" }],
       take: 12,
       include: {
+        category: {
+          select: {
+            name: true,
+            slug: true,
+          },
+        },
         images: {
           orderBy: { sortOrder: "asc" },
           select: { url: true },
@@ -111,7 +107,17 @@ export async function getHomeData(): Promise<HomeData> {
   if (categories.length === 0 && lots.length === 0) {
     return {
       categories: fallbackSpotlightCategories,
-      propertyLots: fallbackPropertyLots,
+      activeLots: fallbackPropertyLots.map((lot) => ({
+        slug: lot.slug,
+        title: lot.title,
+        subtitle: lot.subtitle,
+        location: lot.location,
+        price: lot.price,
+        bids: lot.bids,
+        ending: lot.ending,
+        image: lot.image,
+        categoryName: "Imóveis",
+      })),
       premiumLots: fallbackPremiumLots,
       hasDatabase: false,
       usingFallbackData: true,
@@ -122,26 +128,25 @@ export async function getHomeData(): Promise<HomeData> {
     name: category.name,
     slug: category.slug,
     lots: category.activeLots,
-    image: categoryImages[category.slug] ?? "/catalog/outros/1.jpg",
+    image: getCategoryImage(category.slug),
   })).sort(
     (left, right) =>
       preferredCategoryOrder.indexOf(left.slug) -
       preferredCategoryOrder.indexOf(right.slug),
   );
 
-  const propertyLots = lots
-    .filter((lot) => lot.type === "property")
-    .slice(0, 2)
-    .map((lot: HomeLotRecord, index: number) => ({
+  const activeLots = shuffleLots(lots)
+    .slice(0, 6)
+    .map((lot: HomeLotRecord) => ({
       slug: lot.slug,
-      tag: index === 0 ? "Destaque" : "Popular",
       title: lot.title,
       subtitle: lot.description ?? "Oportunidade em leilao",
       location: [lot.city, lot.state].filter(Boolean).join(", ") || "Brasil",
       price: formatCurrency(Number(lot.currentBid)),
       bids: `${lot.bidCount} ${lot.bidCount === 1 ? "lance" : "lances"}`,
       ending: formatEndsAt(lot.endsAt ? lot.endsAt.toISOString() : null),
-      image: lot.imageUrl ?? lot.images[0]?.url ?? "/catalog/imoveis/1.jpg",
+      image: getLotCoverImage(lot.category?.slug ?? inferCategorySlug(lot.type), lot.slug),
+      categoryName: lot.category?.name ?? inferCategoryName(lot.type),
     }));
 
   const premiumLots = lots
@@ -151,7 +156,7 @@ export async function getHomeData(): Promise<HomeData> {
       slug: lot.slug,
       title: lot.title,
       lots: 1,
-      image: lot.imageUrl ?? lot.images[0]?.url ?? "/catalog/outros/1.jpg",
+      image: getLotCoverImage(lot.category?.slug ?? inferCategorySlug(lot.type), lot.slug),
     }));
 
   return {
@@ -159,12 +164,60 @@ export async function getHomeData(): Promise<HomeData> {
       spotlightCategories.length > 0
         ? spotlightCategories
         : fallbackSpotlightCategories,
-    propertyLots:
-      propertyLots.length > 0 ? propertyLots : fallbackPropertyLots,
+    activeLots:
+      activeLots.length > 0
+        ? activeLots
+        : fallbackPropertyLots.map((lot) => ({
+            slug: lot.slug,
+            title: lot.title,
+            subtitle: lot.subtitle,
+            location: lot.location,
+            price: lot.price,
+            bids: lot.bids,
+            ending: lot.ending,
+            image: lot.image,
+            categoryName: "Imóveis",
+          })),
     premiumLots: premiumLots.length > 0 ? premiumLots : fallbackPremiumLots,
     hasDatabase: true,
     usingFallbackData: false,
   };
+}
+
+function shuffleLots(lots: HomeLotRecord[]) {
+  return [...lots].sort(() => Math.random() - 0.5);
+}
+
+function inferCategoryName(type: HomeLotRecord["type"]) {
+  if (type === "property") {
+    return "Imóveis";
+  }
+
+  if (type === "luxury") {
+    return "Artigos de Luxo";
+  }
+
+  if (type === "electronics") {
+    return "Eletrônicos";
+  }
+
+  return "Outros";
+}
+
+function inferCategorySlug(type: HomeLotRecord["type"]) {
+  if (type === "property") {
+    return "imoveis";
+  }
+
+  if (type === "luxury") {
+    return "artigos-de-luxo";
+  }
+
+  if (type === "electronics") {
+    return "outros";
+  }
+
+  return "outros";
 }
 
 function formatCurrency(value: number) {
