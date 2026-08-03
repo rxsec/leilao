@@ -1,9 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import {
   ArrowRight,
   BadgeCheck,
-  CirclePlay,
   CreditCard,
   Gavel,
   Headphones,
@@ -12,6 +12,7 @@ import {
   Shield,
   Truck,
 } from "lucide-react";
+import { BannerCarousel } from "@/components/banner-carousel";
 import { BrandLogo } from "@/components/brand-logo";
 import { NewsletterForm } from "@/components/newsletter-form";
 import { siteConfig, trustItems } from "@/lib/branding";
@@ -29,91 +30,40 @@ export default async function Home() {
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#eaf1f6_0%,#f4f8fb_16%,#f7f8fa_40%)]">
       <div className="w-full">
-        <section className="hero-photo relative overflow-hidden bg-[#121212] text-white">
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(9,9,9,0.97)_0%,rgba(10,10,10,0.9)_44%,rgba(10,10,10,0.36)_100%)]" />
-          <div className="hero-grid" />
-          <div className="hero-orb hero-orb-one" />
-          <div className="hero-orb hero-orb-two" />
-          <div className="relative grid min-h-[20rem] gap-8 px-4 py-10 sm:px-6 sm:py-12 lg:px-10 xl:grid-cols-[minmax(0,46rem)_1fr] xl:gap-10 xl:px-12">
-            <div className="max-w-[46rem]">
-              <div className="inline-flex rounded-full border border-[#6cb0d5]/20 bg-[#6cb0d5]/10 px-4 py-2 text-[0.72rem] font-bold uppercase tracking-[0.24em] text-[#8fc8e7]">
-                Leilões Online
-              </div>
-              <h1 className="font-display mt-5 text-[2.55rem] font-extrabold leading-[1.02] tracking-[-0.06em] sm:text-[3.35rem] md:max-w-[36rem] lg:text-[4rem] xl:max-w-none xl:text-[5.1rem]">
-                Os melhores produtos
-                <br />
-                com os{" "}
-                <span className="text-[#6cb0d5]">menores preços!</span>
-              </h1>
-              <p className="mt-5 max-w-[40rem] text-[0.98rem] leading-7 text-white/84 sm:text-[1.05rem] sm:leading-8">
-                Participe dos nossos leilões online e arremate produtos
-                incríveis com segurança e transparência.
-              </p>
-
-              <div className="mt-7 grid gap-3 sm:grid-cols-2 xl:flex xl:flex-row">
-                <Link
-                  href="/leiloes"
-                  className="gold-button inline-flex h-12 items-center justify-center gap-2 rounded-xl px-5 text-sm font-bold shadow-[0_14px_30px_rgba(15,93,134,0.22)] transition hover:brightness-95 sm:px-6"
-                >
-                  <Gavel className="h-4 w-4" />
-                  Ver Leilões Ativos
-                </Link>
-                <Link
-                  href="#como-funciona"
-                  className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-white/28 px-5 text-sm font-semibold text-white transition hover:bg-white/8 sm:px-6"
-                >
-                  <CirclePlay className="h-4 w-4" />
-                  Como Funciona
-                </Link>
-              </div>
-
-              <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:mt-10 lg:grid-cols-3 lg:gap-4">
-                <HeroMeta
-                  icon={<Shield className="h-4.5 w-4.5" />}
-                  title="100% Seguro"
-                  text="Seus dados protegidos"
-                />
-                <HeroMeta
-                  icon={<CreditCard className="h-4.5 w-4.5" />}
-                  title="Parcelamento"
-                  text="Em até 12x no cartão"
-                />
-                <HeroMeta
-                  icon={<BadgeCheck className="h-4.5 w-4.5" />}
-                  title="Transparência"
-                  text="Leilões certificados"
-                />
-              </div>
+        <section className="bg-[#f6f8fb] pb-8 pt-6">
+          <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 text-center sm:px-6 lg:px-10">
+            <div className="inline-flex self-center rounded-full border border-[#d4e2ee] bg-white px-4 py-2 text-[0.72rem] font-bold uppercase tracking-[0.24em] text-[#0f5d86] shadow-[0_8px_24px_rgba(15,93,134,0.08)]">
+              Leilões online
             </div>
+            <h1 className="font-display mx-auto max-w-[54rem] text-[2.2rem] font-extrabold leading-[1.04] tracking-[-0.06em] text-[#102331] sm:text-[3rem] lg:text-[4rem]">
+              Oportunidades reais em categorias selecionadas para arremate
+            </h1>
+            <p className="mx-auto max-w-[48rem] text-[0.98rem] leading-7 text-[#4d6477] sm:text-[1.04rem]">
+              Navegue pelo catálogo, acompanhe os lotes ao vivo e encontre
+              imóveis, eletrônicos, joias e artigos premium em um único lugar.
+            </p>
+          </div>
+        </section>
 
-            <div className="relative hidden min-h-[24rem] xl:block">
-              <div className="absolute left-[8%] top-[8%] h-32 w-32 rounded-full border border-[#6cb0d5]/20 bg-[#6cb0d5]/8 backdrop-blur-sm animate-[pulse_5s_ease-in-out_infinite]" />
-              <div className="absolute right-[12%] top-[18%] h-24 w-24 rounded-full border border-white/10 bg-white/4 animate-[pulse_7s_ease-in-out_infinite]" />
-              <div className="absolute bottom-[12%] left-[18%] h-40 w-40 rounded-full border border-[#0f5d86]/18 bg-[#0f5d86]/10 blur-[2px] animate-[pulse_9s_ease-in-out_infinite]" />
+        <BannerCarousel />
 
-              <div className="absolute right-[10%] top-[14%] w-[18rem] rounded-[1.4rem] border border-white/10 bg-white/6 p-5 backdrop-blur-md">
-                <p className="text-xs uppercase tracking-[0.28em] text-[#6cb0d5]">
-                  Leilões em destaque
-                </p>
-                <p className="mt-3 text-2xl font-bold text-white">
-                  Imóveis, eletrônicos e itens premium
-                </p>
-                <p className="mt-3 text-sm leading-7 text-white/68">
-                  Plataforma moderna com experiência organizada para o usuário
-                  encontrar oportunidades com rapidez.
-                </p>
-              </div>
-
-              <div className="absolute left-[12%] bottom-[10%] w-[16rem] rounded-[1.4rem] border border-white/10 bg-[#0f5d86]/18 p-5 backdrop-blur-md">
-                <p className="text-sm font-semibold text-white/74">
-                  Ambientes seguros, navegação simples e identidade visual mais
-                  alinhada com a marca.
-                </p>
-                <div className="mt-4 h-2 rounded-full bg-white/10">
-                  <div className="h-2 w-[72%] rounded-full bg-[#6cb0d5]" />
-                </div>
-              </div>
-            </div>
+        <section className="bg-[#f6f8fb] px-4 pb-8 sm:px-6 lg:px-10">
+          <div className="mx-auto grid max-w-7xl gap-3 sm:grid-cols-2 lg:grid-cols-3 lg:gap-4">
+            <HeroMeta
+              icon={<Shield className="h-4.5 w-4.5" />}
+              title="100% Seguro"
+              text="Seus dados protegidos"
+            />
+            <HeroMeta
+              icon={<CreditCard className="h-4.5 w-4.5" />}
+              title="Parcelamento"
+              text="Em até 12x no cartão"
+            />
+            <HeroMeta
+              icon={<BadgeCheck className="h-4.5 w-4.5" />}
+              title="Transparência"
+              text="Leilões certificados"
+            />
           </div>
         </section>
 
@@ -442,16 +392,16 @@ function HeroMeta({
   title,
   text,
 }: {
-  icon: React.ReactNode;
+  icon: ReactNode;
   title: string;
   text: string;
 }) {
   return (
-    <div className="flex items-start gap-3">
-      <div className="mt-1 text-white">{icon}</div>
+    <div className="flex items-start gap-3 rounded-[1rem] border border-[#d8e4ec] bg-white px-4 py-4 shadow-[0_12px_30px_rgba(15,93,134,0.06)]">
+      <div className="mt-1 text-[#0f5d86]">{icon}</div>
       <div>
-        <p className="font-semibold text-white">{title}</p>
-        <p className="text-sm text-white/66">{text}</p>
+        <p className="font-semibold text-[#102331]">{title}</p>
+        <p className="text-sm text-[#61788b]">{text}</p>
       </div>
     </div>
   );

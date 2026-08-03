@@ -1,144 +1,212 @@
 import Link from "next/link";
-import { ChevronDown, Search, UserRound } from "lucide-react";
+import {
+  ChevronDown,
+  Heart,
+  LayoutGrid,
+  Menu,
+  MonitorPlay,
+  Search,
+  ShoppingCart,
+  UserRound,
+} from "lucide-react";
 import { logoutUser } from "@/app/actions";
 import { BrandLogo } from "@/components/brand-logo";
-import { navigation } from "@/lib/branding";
+import { getAuctionFilterOptions } from "@/lib/auction-data";
 import { getCurrentUser } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 export async function SiteHeader() {
-  const user = await getCurrentUser();
+  const [user, categories, liveLotsCount] = await Promise.all([
+    getCurrentUser(),
+    getAuctionFilterOptions(),
+    prisma.lot.count({ where: { status: "live" } }),
+  ]);
 
   return (
-    <header className="border-b border-[#d6e0e8] bg-[linear-gradient(180deg,#f3f6f9,#edf2f6)] px-4 py-4 text-[#103f5a] shadow-[0_10px_30px_rgba(16,63,90,0.08)] sm:px-6">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-        <div className="flex w-full items-center justify-center gap-6 xl:justify-between xl:gap-12">
-          <Link
-            href="/"
-            className="flex w-full items-center justify-center xl:w-auto xl:justify-start"
+    <header className="sticky top-0 z-40 border-b border-[#d7e3ec] bg-[#dfe8f5]/96 px-4 py-3 text-[#103f5a] shadow-[0_12px_34px_rgba(15,93,134,0.08)] backdrop-blur sm:px-6">
+      <div className="mx-auto flex w-full max-w-[120rem] items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            className="flex h-10 w-10 items-center justify-center rounded-full text-[#44627a] transition hover:bg-white/70"
+            aria-label="Abrir menu"
           >
-            <BrandLogo className="h-12 w-[15rem] sm:h-14 sm:w-[18rem] lg:h-14 lg:w-[20rem]" />
-          </Link>
+            <Menu className="h-5 w-5" />
+          </button>
 
-          <nav className="hidden items-center gap-6 text-[0.95rem] font-semibold xl:flex 2xl:gap-10 2xl:text-[0.98rem]">
-            <Link
-              href="/leiloes"
-              className="flex items-center gap-1 whitespace-nowrap text-[#18232c] transition hover:text-[#0f5d86]"
-            >
-              Leilões
-            </Link>
-            {navigation.map((item) => (
-              <Link
-                key={item}
-                href={`/#${slugify(item)}`}
-                className="flex items-center gap-1 whitespace-nowrap text-[#18232c] transition hover:text-[#0f5d86]"
-              >
-                {item}
-                {item === "Categorias" ? (
-                  <ChevronDown className="h-4 w-4" />
-                ) : null}
-              </Link>
-            ))}
-            {user ? (
-              <Link
-                href="/meus-lances"
-                className="flex items-center gap-1 whitespace-nowrap text-[#18232c] transition hover:text-[#0f5d86]"
-              >
-                Meus lances
-              </Link>
-            ) : null}
-            {user?.role === "admin" ? (
-              <Link
-                href="/admin"
-                className="flex items-center gap-1 whitespace-nowrap text-[#18232c] transition hover:text-[#0f5d86]"
-              >
-                Admin
-              </Link>
-            ) : null}
-          </nav>
+          <Link href="/" className="flex items-center">
+            <BrandLogo className="h-9 w-[11rem] sm:h-10 sm:w-[12rem]" />
+          </Link>
         </div>
 
-        <nav className="grid grid-cols-2 gap-2 xl:hidden sm:grid-cols-5">
-          <Link
-            href="/leiloes"
-            className="flex h-11 items-center justify-center rounded-2xl border border-[#cfe0ea] bg-white/80 px-4 text-sm font-semibold text-[#18425d] shadow-[0_4px_14px_rgba(15,93,134,0.06)] transition hover:bg-white"
-          >
-            Leilões
-          </Link>
-          {navigation.map((item) => (
-            <Link
-              key={item}
-              href={`/#${slugify(item)}`}
-              className="flex h-11 items-center justify-center rounded-2xl border border-[#cfe0ea] bg-white/80 px-4 text-sm font-semibold text-[#18425d] shadow-[0_4px_14px_rgba(15,93,134,0.06)] transition hover:bg-white"
-            >
-              {item}
-            </Link>
-          ))}
-        </nav>
+        <div className="hidden flex-1 items-center justify-center gap-4 lg:flex">
+          <details className="group relative">
+            <summary className="flex h-11 min-w-[9.5rem] cursor-pointer list-none items-center justify-center gap-2 rounded-full bg-[#ff9e28] px-5 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(255,158,40,0.28)]">
+              <LayoutGrid className="h-4 w-4" />
+              Categorias
+              <ChevronDown className="h-4 w-4 transition group-open:rotate-180" />
+            </summary>
 
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center xl:gap-4">
+            <div className="absolute left-0 top-[calc(100%+0.8rem)] z-50 w-[22rem] rounded-[1.4rem] border border-[#d7e3ec] bg-white p-3 shadow-[0_24px_60px_rgba(15,93,134,0.14)]">
+              <div className="grid gap-2 sm:grid-cols-2">
+                {categories.map((category) => (
+                  <Link
+                    key={category.slug}
+                    href={`/leiloes?category=${category.slug}`}
+                    className="rounded-xl px-3 py-3 text-sm font-semibold text-[#244457] transition hover:bg-[#eef5fa] hover:text-[#0f5d86]"
+                  >
+                    {category.name}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </details>
+
           <form
             action="/leiloes"
-            className="lg:flex-1 xl:min-w-[24rem] xl:max-w-[34rem]"
+            className="flex h-14 w-full max-w-[28rem] items-center rounded-full bg-white pl-6 pr-2 shadow-[0_10px_24px_rgba(15,93,134,0.08)]"
           >
-            <label className="flex h-12 w-full items-center gap-3 rounded-full border border-[#d7e0e8] bg-white px-4 text-sm text-neutral-500 shadow-[0_6px_18px_rgba(15,93,134,0.06)]">
-              <Search className="h-4 w-4 text-[#8a98a6]" />
-              <input
-                name="q"
-                className="w-full bg-transparent outline-none placeholder:text-neutral-400"
-                placeholder="Buscar por itens ou categorias..."
-              />
-            </label>
+            <input
+              name="q"
+              className="w-full bg-transparent text-[1rem] text-[#244457] outline-none placeholder:text-[#6f8797]"
+              placeholder="Pesquisar..."
+            />
+            <button
+              type="submit"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-[#eef5fb] text-[#0f5d86] transition hover:bg-[#e0edf8]"
+              aria-label="Pesquisar"
+            >
+              <Search className="h-5 w-5" />
+            </button>
           </form>
-
-          <div className="flex flex-wrap items-center gap-3">
-            {user ? (
-              <>
-                <span className="rounded-full border border-[#cfe0ea] bg-white/80 px-4 py-2 text-sm font-semibold text-[#18425d]">
-                  {user.name}
-                </span>
-                <Link
-                  href={user.role === "admin" ? "/admin" : "/meus-lances"}
-                  className="flex h-11 items-center justify-center rounded-2xl border border-[#0f5d86]/18 bg-white px-4 text-sm font-semibold text-[#0f5d86] transition hover:bg-[#eef5fa]"
-                >
-                  {user.role === "admin" ? "Painel admin" : "Minha conta"}
-                </Link>
-                <form action={logoutUser}>
-                  <button
-                    type="submit"
-                    className="gold-button inline-flex h-11 items-center justify-center rounded-xl px-4 text-sm font-bold transition hover:brightness-95"
-                  >
-                    Sair
-                  </button>
-                </form>
-              </>
-            ) : (
-              <>
-                <Link
-                  href="/entrar"
-                  className="flex h-11 items-center justify-center rounded-2xl border border-[#0f5d86]/18 bg-white px-4 text-sm font-semibold text-[#0f5d86] transition hover:bg-[#eef5fa]"
-                >
-                  Entrar
-                </Link>
-                <Link
-                  href="/cadastro"
-                  className="gold-button inline-flex h-11 items-center justify-center gap-2 rounded-xl px-4 text-sm font-bold transition hover:brightness-95"
-                >
-                  <UserRound className="h-4 w-4" />
-                  Criar conta
-                </Link>
-              </>
-            )}
-          </div>
         </div>
+
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Link
+            href="/leiloes"
+            className="hidden items-center gap-2 rounded-full bg-[#ffd8df] px-4 py-3 text-sm font-semibold text-[#651a26] md:flex"
+          >
+            <MonitorPlay className="h-4 w-4" />
+            Ao vivo
+            {liveLotsCount > 0 ? (
+              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#cf203d] px-1 text-[0.7rem] text-white">
+                {liveLotsCount}
+              </span>
+            ) : null}
+          </Link>
+
+          {user ? (
+            <Link
+              href={user.role === "admin" ? "/admin" : "/meus-lances"}
+              className="hidden text-sm font-semibold text-[#39566f] transition hover:text-[#0f5d86] md:block"
+            >
+              Minha conta
+            </Link>
+          ) : (
+            <Link
+              href="/entrar"
+              className="hidden text-sm font-semibold text-[#39566f] transition hover:text-[#0f5d86] md:block"
+            >
+              Entrar
+            </Link>
+          )}
+
+          <button
+            type="button"
+            className="hidden h-10 w-10 items-center justify-center rounded-full text-[#39566f] transition hover:bg-white/70 md:flex"
+            aria-label="Favoritos"
+          >
+            <Heart className="h-5 w-5" />
+          </button>
+
+          <button
+            type="button"
+            className="hidden h-10 w-10 items-center justify-center rounded-full text-[#39566f] transition hover:bg-white/70 md:flex"
+            aria-label="Carrinho"
+          >
+            <ShoppingCart className="h-5 w-5" />
+          </button>
+
+          {user ? (
+            <>
+              <Link
+                href={user.role === "admin" ? "/admin" : "/meus-lances"}
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-[#2a6fc4] text-white shadow-[0_10px_24px_rgba(42,111,196,0.22)] transition hover:brightness-105"
+                aria-label="Conta do usuário"
+              >
+                <UserRound className="h-5 w-5" />
+              </Link>
+              <form action={logoutUser}>
+                <button
+                  type="submit"
+                  className="hidden rounded-full border border-[#cfe0ea] bg-white/80 px-4 py-2 text-sm font-semibold text-[#18425d] transition hover:bg-white lg:block"
+                >
+                  Sair
+                </button>
+              </form>
+            </>
+          ) : (
+            <Link
+              href="/cadastro"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-[#2a6fc4] text-white shadow-[0_10px_24px_rgba(42,111,196,0.22)] transition hover:brightness-105"
+              aria-label="Criar conta"
+            >
+              <UserRound className="h-5 w-5" />
+            </Link>
+          )}
+
+          {user?.role === "admin" ? (
+            <Link
+              href="/admin"
+              className="hidden rounded-full border border-[#cfe0ea] bg-white/80 px-4 py-2 text-sm font-semibold text-[#18425d] transition hover:bg-white xl:block"
+            >
+              Admin
+            </Link>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="mx-auto mt-3 flex max-w-[120rem] items-center gap-3 lg:hidden">
+        <details className="group relative">
+          <summary className="flex h-11 min-w-[9rem] cursor-pointer list-none items-center justify-center gap-2 rounded-full bg-[#ff9e28] px-4 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(255,158,40,0.28)]">
+            <LayoutGrid className="h-4 w-4" />
+            Categorias
+            <ChevronDown className="h-4 w-4 transition group-open:rotate-180" />
+          </summary>
+
+          <div className="absolute left-0 top-[calc(100%+0.8rem)] z-50 w-[18rem] rounded-[1.2rem] border border-[#d7e3ec] bg-white p-3 shadow-[0_24px_60px_rgba(15,93,134,0.14)]">
+            <div className="grid gap-2">
+              {categories.map((category) => (
+                <Link
+                  key={category.slug}
+                  href={`/leiloes?category=${category.slug}`}
+                  className="rounded-xl px-3 py-3 text-sm font-semibold text-[#244457] transition hover:bg-[#eef5fa] hover:text-[#0f5d86]"
+                >
+                  {category.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </details>
+
+        <form
+          action="/leiloes"
+          className="flex h-12 flex-1 items-center rounded-full bg-white pl-5 pr-2 shadow-[0_10px_24px_rgba(15,93,134,0.08)]"
+        >
+          <input
+            name="q"
+            className="w-full bg-transparent text-sm text-[#244457] outline-none placeholder:text-[#6f8797]"
+            placeholder="Pesquisar..."
+          />
+          <button
+            type="submit"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-[#eef5fb] text-[#0f5d86]"
+            aria-label="Pesquisar"
+          >
+            <Search className="h-4 w-4" />
+          </button>
+        </form>
       </div>
     </header>
   );
-}
-
-function slugify(value: string) {
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/\s+/g, "-");
 }
