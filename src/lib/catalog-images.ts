@@ -67,8 +67,8 @@ const curatedCategoryImageBySlug: Record<string, string> = {
   eletrodomesticos: "/catalog-featured/geladeira-brastemp-frost-free-375l.jpg",
   "ar-condicionado": "/catalog-featured/split-inverter-lg-dual-voice-9000-btus.jpg",
   notebooks: "/catalog/notebooks/1.jpg",
-  "computadores-gamer": "/catalog/computadores-gamer/1.jpg",
-  outros: "/catalog-featured/camera-sony-alpha-a6400.webp",
+  "computadores-gamer": "/catalog-featured/pc-gamer-ryzen-5-rtx-4060-16gb.jpg",
+  outros: "/catalog-featured/drone-dji-mini-4k-fly-more.png",
   terrenos: "/catalog/terrenos/1.jpg",
   imoveis: "/catalog/imoveis/1.jpg",
   relogios: "/catalog-featured/rolex-datejust-41-aco-e-ouro.png",
@@ -82,6 +82,12 @@ const curatedLotGalleryBySlug: Record<string, string[]> = {
     "/catalog-featured/apple-iphone-16-128gb.jpg",
     "/catalog-featured/apple-iphone-16-128gb-white.png",
   ],
+  "apple-iphone-15-128gb": [
+    "/catalog-featured/apple-iphone-15-128gb.png",
+  ],
+  "apple-iphone-14-128gb": [
+    "/catalog-featured/apple-iphone-14-128gb.png",
+  ],
   "samsung-smart-tv-crystal-55-4k": [
     "/catalog-featured/samsung-smart-tv-crystal-55-4k.jpg",
   ],
@@ -93,6 +99,12 @@ const curatedLotGalleryBySlug: Record<string, string[]> = {
   ],
   "camera-sony-alpha-a6400": [
     "/catalog-featured/camera-sony-alpha-a6400.webp",
+  ],
+  "drone-dji-mini-4k-fly-more": [
+    "/catalog-featured/drone-dji-mini-4k-fly-more.png",
+  ],
+  "pc-gamer-ryzen-5-rtx-4060-16gb": [
+    "/catalog-featured/pc-gamer-ryzen-5-rtx-4060-16gb.jpg",
   ],
   "rolex-datejust-41-aco-e-ouro": [
     "/catalog-featured/rolex-datejust-41-aco-e-ouro.png",
@@ -116,9 +128,9 @@ export const featuredHomeLotSlugs = [
 
 export const featuredPremiumLotSlugs = [
   "apple-iphone-16-128gb",
+  "apple-iphone-15-128gb",
   "camera-sony-alpha-a6400",
-  "anel-solitario-ouro-18k-com-diamante",
-  "bolsa-louis-vuitton-neverfull-mm",
+  "drone-dji-mini-4k-fly-more",
 ];
 
 export function getCategoryImage(slug: string) {
