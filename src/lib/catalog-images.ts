@@ -66,9 +66,9 @@ const curatedCategoryImageBySlug: Record<string, string> = {
   televisores: "/catalog-featured/samsung-smart-tv-crystal-55-4k.jpg",
   eletrodomesticos: "/catalog-featured/geladeira-brastemp-frost-free-375l.jpg",
   "ar-condicionado": "/catalog-featured/split-inverter-lg-dual-voice-9000-btus.jpg",
-  notebooks: "/catalog/notebooks/1.jpg",
+  notebooks: "/catalog-featured/macbook-air-m2-13-256gb.jpg",
   "computadores-gamer": "/catalog-featured/pc-gamer-ryzen-5-rtx-4060-16gb.jpg",
-  outros: "/catalog-featured/drone-dji-mini-4k-fly-more.png",
+  outros: "/catalog-featured/console-playstation-5-slim.jpg",
   terrenos: "/catalog/terrenos/1.jpg",
   imoveis: "/catalog/imoveis/1.jpg",
   relogios: "/catalog-featured/rolex-datejust-41-aco-e-ouro.png",
@@ -103,6 +103,15 @@ const curatedLotGalleryBySlug: Record<string, string[]> = {
   "drone-dji-mini-4k-fly-more": [
     "/catalog-featured/drone-dji-mini-4k-fly-more.png",
   ],
+  "console-playstation-5-slim": [
+    "/catalog-featured/console-playstation-5-slim.jpg",
+  ],
+  "nintendo-switch-oled": [
+    "/catalog-featured/nintendo-switch-oled.jpg",
+  ],
+  "macbook-air-m2-13-256gb": [
+    "/catalog-featured/macbook-air-m2-13-256gb.jpg",
+  ],
   "pc-gamer-ryzen-5-rtx-4060-16gb": [
     "/catalog-featured/pc-gamer-ryzen-5-rtx-4060-16gb.jpg",
   ],
@@ -129,7 +138,10 @@ export const featuredHomeLotSlugs = [
 export const featuredPremiumLotSlugs = [
   "apple-iphone-16-128gb",
   "apple-iphone-15-128gb",
+  "macbook-air-m2-13-256gb",
   "camera-sony-alpha-a6400",
+  "console-playstation-5-slim",
+  "nintendo-switch-oled",
   "drone-dji-mini-4k-fly-more",
 ];
 
