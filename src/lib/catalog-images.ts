@@ -69,11 +69,11 @@ const curatedCategoryImageBySlug: Record<string, string> = {
   notebooks: "/produtos/notebooks/macbook-pro-13-apple-mwp42bza-cinza-espacial-intel-core-i5-1038ng7-ram-16gb-ssd-512gb-macos.jpg",
   "computadores-gamer": "/produtos/computadores-gamer/draven-completo-fundo-branco-ijyhk_640x640+fill_ffffff.jpg",
   outros: "/catalog-featured/console-playstation-5-slim.jpg",
-  terrenos: "/catalog/terrenos/1.jpg",
-  imoveis: "/catalog/imoveis/1.jpg",
+  terrenos: "/produtos/categorias/pelotas-terreno-condominio-sao-goncalo-19-07-2024_17-20-45-0.webp",
+  imoveis: "/produtos/categorias/imsasasasaages.jpeg",
   relogios: "/catalog-featured/rolex-datejust-41-aco-e-ouro.png",
-  joias: "/catalog-featured/anel-solitario-ouro-18k-com-diamante.png",
-  "artigos-de-luxo": "/catalog-featured/bolsa-louis-vuitton-neverfull-mm.jpg",
+  joias: "/produtos/categorias/imsasasasaages.jpeg",
+  "artigos-de-luxo": "/produtos/categorias/bolsa_louis_vuitton_onthego_mm_monograma_15043_1_36a573064ecf917cabd86e751d63b9f3.webp",
 };
 
 const curatedLotGalleryBySlug: Record<string, string[]> = {

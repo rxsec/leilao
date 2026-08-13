@@ -178,7 +178,7 @@ function inferCategoryName(type: HomeLotRecord["type"]) {
     return "Eletronicos";
   }
 
-  return "Outros";
+  return "Consoles";
 }
 
 function inferCategorySlug(type: HomeLotRecord["type"]) {

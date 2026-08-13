@@ -158,7 +158,7 @@ const fallbackLotSeeds: FallbackLotSeed[] = [
     bidCount: 10,
     image: fallbackPremiumLots[3].image,
     endsAtOffsetHours: 54,
-    categoryName: "Outros",
+    categoryName: "Consoles",
     isFeatured: false,
   },
 ];
@@ -471,7 +471,7 @@ function inferCategoryName(type: LotType) {
     return "Artigo de Luxos";
   }
 
-  return "Outros";
+  return "Consoles";
 }
 
 function resolveLotOrder(sort: GetAuctionLotsOptions["sort"]) {

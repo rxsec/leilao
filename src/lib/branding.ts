@@ -54,7 +54,7 @@ export const spotlightCategories = [
     image: "/catalog/computadores-gamer/1.jpg",
   },
   {
-    name: "Outros",
+    name: "Consoles",
     slug: "outros",
     lots: 10,
     image: "/catalog/outros/1.jpg",
