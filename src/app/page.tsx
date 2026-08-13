@@ -237,9 +237,9 @@ function SectionHeader({
       </h2>
       <Link
         href={id ? `#${id}` : "#"}
-        className={`inline-flex h-11 items-center gap-2 self-start rounded-full px-5 text-sm font-medium transition sm:self-auto ${
+        className={`inline-flex h-10 items-center gap-2 self-start rounded-full px-5 text-sm font-medium transition sm:self-auto ${
           darkAction
-            ? "bg-[#0f5d86] text-white hover:brightness-95"
+            ? "bg-[#0f5d86] text-white shadow-[0_10px_24px_rgba(15,93,134,0.18)] hover:brightness-95"
             : "border border-black/8 bg-white text-neutral-700 hover:border-black/15"
         }`}
       >
