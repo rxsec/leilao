@@ -110,12 +110,12 @@ export default async function Home() {
                     href={`/leiloes/${lot.slug}`}
                     className="section-card overflow-hidden rounded-[1rem] transition hover:-translate-y-1"
                   >
-                    <div className="relative h-[10.2rem] overflow-hidden sm:h-[12rem]">
+                    <div className="relative h-[10.2rem] overflow-hidden bg-[#f8fbfd] sm:h-[12rem]">
                       <Image
                         src={lot.image}
                         alt={lot.title}
                         fill
-                        className="object-cover"
+                        className="object-contain p-3"
                         sizes="350px"
                       />
                       <span className="accent-button absolute left-4 top-4 rounded-full px-3 py-1 text-[0.68rem] font-bold">
@@ -164,12 +164,12 @@ export default async function Home() {
                     href={`/leiloes/${lot.slug}`}
                     className="section-card flex h-full flex-col overflow-hidden rounded-[1rem] transition hover:-translate-y-1"
                   >
-                    <div className="relative h-[10.5rem] overflow-hidden sm:h-[12rem]">
+                    <div className="relative h-[10.5rem] overflow-hidden bg-[#f8fbfd] sm:h-[12rem]">
                       <Image
                         src={lot.image}
                         alt={lot.title}
                         fill
-                        className="object-cover"
+                        className="object-contain p-3"
                         sizes="200px"
                       />
                     </div>

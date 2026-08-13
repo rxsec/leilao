@@ -36,12 +36,12 @@ export default async function LotDetailPage({
 
         <div className="mt-5 grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
           <article className="section-card overflow-hidden rounded-[1.4rem]">
-            <div className="relative h-[22rem] bg-white sm:h-[28rem]">
+            <div className="relative h-[22rem] bg-[#f8fbfd] sm:h-[28rem]">
               <Image
                 src={lot.image}
                 alt={lot.title}
                 fill
-                className="object-cover"
+                className="object-contain p-4"
                 sizes="(max-width: 1280px) 100vw, 60vw"
               />
             </div>
@@ -51,13 +51,13 @@ export default async function LotDetailPage({
                 {lot.images.slice(0, 3).map((image, index) => (
                   <div
                     key={`${lot.slug}-image-${index}`}
-                    className="relative h-24 overflow-hidden rounded-xl bg-white sm:h-28"
+                    className="relative h-24 overflow-hidden rounded-xl bg-[#f8fbfd] sm:h-28"
                   >
                     <Image
                       src={image}
                       alt={`${lot.title} - imagem ${index + 1}`}
                       fill
-                      className="object-cover"
+                      className="object-contain p-2"
                       sizes="200px"
                     />
                   </div>
@@ -193,12 +193,12 @@ export default async function LotDetailPage({
                   href={`/leiloes/${relatedLot.slug}`}
                   className="section-card overflow-hidden rounded-[1.2rem] transition hover:-translate-y-1"
                 >
-                  <div className="relative h-48 bg-white">
+                  <div className="relative h-48 bg-[#f8fbfd]">
                     <Image
                       src={relatedLot.image}
                       alt={relatedLot.title}
                       fill
-                      className="object-cover"
+                      className="object-contain p-3"
                       sizes="(max-width: 768px) 100vw, 33vw"
                     />
                   </div>

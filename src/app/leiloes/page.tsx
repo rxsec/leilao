@@ -181,12 +181,12 @@ export default async function LeiloesPage({
                 key={lot.slug}
                 className="section-card overflow-hidden rounded-[1.2rem]"
               >
-                <div className="relative h-56 bg-white">
+                <div className="relative h-56 bg-[#f8fbfd]">
                   <Image
                     src={lot.image}
                     alt={lot.title}
                     fill
-                    className="object-cover"
+                    className="object-contain p-3"
                     sizes="(max-width: 768px) 100vw, 33vw"
                   />
                   <span className="accent-button absolute left-4 top-4 rounded-full px-3 py-1 text-[0.7rem] font-bold uppercase">
