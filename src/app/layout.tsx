@@ -17,6 +17,11 @@ const manrope = Manrope({
 export const metadata: Metadata = {
   title: `${siteConfig.name} | Leilões Online`,
   description: siteConfig.description,
+  icons: {
+    icon: "/favicon.webp",
+    shortcut: "/favicon.webp",
+    apple: "/favicon.webp",
+  },
 };
 
 export default function RootLayout({

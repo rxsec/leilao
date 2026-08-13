@@ -11,16 +11,13 @@ import {
   Truck,
 } from "lucide-react";
 import { BannerCarousel } from "@/components/banner-carousel";
-import { BrandLogo } from "@/components/brand-logo";
-import { NewsletterForm } from "@/components/newsletter-form";
-import { siteConfig, trustItems } from "@/lib/branding";
+import { trustItems } from "@/lib/branding";
 import { getHomeData } from "@/lib/home-data";
 
 export default async function Home() {
   const {
     activeLots,
     categories,
-    hasDatabase,
     premiumLots,
     usingFallbackData,
   } = await getHomeData();
@@ -211,88 +208,6 @@ export default async function Home() {
               </div>
             ))}
           </section>
-
-          <section className="mt-10 grid gap-5 xl:grid-cols-[1.1fr_0.9fr]">
-            <div
-              id="sobre-nos"
-              className="section-card rounded-[1rem] px-5 py-6 sm:px-6"
-            >
-              <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#0f5d86]">
-                Sobre Nós
-              </p>
-              <h2 className="mt-3 text-[2rem] font-extrabold tracking-[-0.04em] text-neutral-950">
-                Estrutura pronta para uma operação de leilões moderna
-              </h2>
-              <p className="mt-4 max-w-[42rem] text-[1rem] leading-8 text-neutral-600">
-                Esta base foi organizada para servir como homepage institucional
-                de leilões, com visual alinhado à marca, áreas de destaque para
-                produtos, imóveis e itens de valor, além de uma estrutura fácil
-                de conectar ao Supabase e publicar na Vercel.
-              </p>
-              <div className="mt-6 grid gap-4 sm:grid-cols-3">
-                <MiniStat label="Base visual" value="Pronta" />
-                <MiniStat label="Supabase" value="Estruturado" />
-                <MiniStat label="Deploy" value="Vercel Ready" />
-              </div>
-            </div>
-
-            <div
-              id="contato"
-              className="rounded-[1rem] bg-[linear-gradient(160deg,#0b2230,#0f4f72)] p-5 text-white shadow-[0_18px_40px_rgba(15,93,134,0.18)]"
-            >
-              <div className="grid-pattern flex h-full flex-col justify-between rounded-[0.9rem] border border-white/10 p-6">
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#bfe2f3]">
-                    Contato
-                  </p>
-                  <h2 className="mt-3 text-[2rem] font-extrabold tracking-[-0.04em] text-white">
-                    Central de atendimento
-                  </h2>
-                  <p className="mt-4 text-[1rem] leading-8 text-white/78">
-                    Use esta área para captar leads, responder dúvidas e
-                    direcionar visitantes para a equipe comercial.
-                  </p>
-                </div>
-                <div className="mt-6 space-y-3 text-sm text-white/86">
-                  <p>E-mail: {siteConfig.supportEmail}</p>
-                  <p>Telefone: {siteConfig.phone}</p>
-                  <p>Cidade: {siteConfig.city}</p>
-                </div>
-                <NewsletterForm enabled={hasDatabase} />
-              </div>
-            </div>
-          </section>
-
-          <footer className="mt-10 rounded-[1rem] bg-[#0f1720] px-5 py-6 text-white sm:px-6">
-            <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-              <div>
-                <BrandLogo className="h-12 w-[16rem] sm:h-14 sm:w-[18rem]" />
-                <p className="mt-4 max-w-[28rem] text-sm leading-7 text-white/62">
-                  {siteConfig.name} - plataforma institucional para leilões
-                  online com identidade moderna, estrutura pronta para
-                  integração com Supabase e publicação na Vercel.
-                </p>
-              </div>
-
-              <div className="grid gap-3 text-sm text-white/70 sm:grid-cols-2 lg:text-right">
-                <Link href="#categorias" className="transition hover:text-white">
-                  Categorias
-                </Link>
-                <Link
-                  href="#como-funciona"
-                  className="transition hover:text-white"
-                >
-                  Como Funciona
-                </Link>
-                <Link href="#sobre-nos" className="transition hover:text-white">
-                  Sobre Nós
-                </Link>
-                <Link href="#contato" className="transition hover:text-white">
-                  Contato
-                </Link>
-              </div>
-            </div>
-          </footer>
         </section>
       </div>
     </main>
@@ -351,17 +266,6 @@ function HeroMeta({
         <p className="font-semibold text-[#102331]">{title}</p>
         <p className="text-sm text-[#61788b]">{text}</p>
       </div>
-    </div>
-  );
-}
-
-function MiniStat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-2xl border border-[var(--line)] bg-white px-4 py-4">
-      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-neutral-400">
-        {label}
-      </p>
-      <p className="mt-2 text-lg font-extrabold text-[#0f5d86]">{value}</p>
     </div>
   );
 }

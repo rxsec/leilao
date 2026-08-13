@@ -88,8 +88,9 @@ input {
 }
 
 .accent-button {
-  background: linear-gradient(180deg, #ffca2c, #efb811);
-  color: #111111;
+  background: linear-gradient(180deg, #ffc933, #f3b318);
+  color: #14212a;
+  box-shadow: 0 8px 20px rgba(243, 179, 24, 0.22);
 }
 
 .hero-orb {
