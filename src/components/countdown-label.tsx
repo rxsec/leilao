@@ -54,7 +54,7 @@ function formatCountdownLabel(endsAtIso: string | null) {
   if (days > 0) {
     return `Termina em ${days}d ${String(hours).padStart(2, "0")}h ${String(
       minutes,
-    ).padStart(2, "0")}m`;
+    ).padStart(2, "0")}m ${String(seconds).padStart(2, "0")}s`;
   }
 
   if (hours > 0) {

@@ -1,3 +1,4 @@
+import { closeExpiredLots } from "@/lib/lot-closing";
 import { prisma } from "@/lib/prisma";
 
 type LotType = "property" | "electronics" | "luxury" | "other";
@@ -103,6 +104,8 @@ type AdminCustomerRecord = {
 };
 
 export async function getAdminPanelData() {
+  await closeExpiredLots();
+
   const [categories, lots, passwordResetRequests, customers]: [
     AdminCategory[],
     AdminLotRecord[],

@@ -7,6 +7,7 @@ import {
   getCategoryImage,
   getLotCoverImage,
 } from "@/lib/catalog-images";
+import { closeExpiredLots } from "@/lib/lot-closing";
 import { prisma } from "@/lib/prisma";
 
 type SpotlightCategory = {
@@ -84,6 +85,8 @@ const preferredCategoryOrder = [
 ];
 
 export async function getHomeData(): Promise<HomeData> {
+  await closeExpiredLots();
+
   const [categories, lots]: [HomeCategoryRecord[], HomeLotRecord[]] = await Promise.all([
     prisma.category.findMany({
       orderBy: { createdAt: "asc" },

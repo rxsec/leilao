@@ -3,6 +3,7 @@ import {
   propertyLots as fallbackPropertyLots,
 } from "@/lib/branding";
 import { getCategoryImage, getLotGallery } from "@/lib/catalog-images";
+import { closeExpiredLots } from "@/lib/lot-closing";
 import { prisma } from "@/lib/prisma";
 
 type LotType = "property" | "electronics" | "luxury" | "other";
@@ -181,6 +182,8 @@ const preferredCategoryOrder = [
 export async function getAuctionLots(
   options?: GetAuctionLotsOptions,
 ): Promise<AuctionLotsResult> {
+  await closeExpiredLots();
+
   const search = options?.search?.trim() ?? "";
   const category = options?.category?.trim() ?? "";
   const type = options?.type ?? "";
@@ -268,6 +271,8 @@ export async function getAuctionFilterOptions(): Promise<AuctionFilterOption[]> 
 }
 
 export async function getLotDetail(slug: string): Promise<LotDetail | null> {
+  await closeExpiredLots();
+
   const lot = await prisma.lot.findUnique({
     where: { slug },
     include: {

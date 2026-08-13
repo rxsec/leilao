@@ -1,3 +1,4 @@
+import { closeExpiredLots } from "@/lib/lot-closing";
 import { prisma } from "@/lib/prisma";
 
 export type UserBidItem = {
@@ -51,6 +52,8 @@ type DashboardOrderRecord = {
 };
 
 export async function getUserDashboardData(userId: string) {
+  await closeExpiredLots();
+
   const [bids, orders]: [DashboardBidRecord[], DashboardOrderRecord[]] =
     await Promise.all([
     prisma.bid.findMany({

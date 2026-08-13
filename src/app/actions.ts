@@ -13,6 +13,7 @@ import {
   getCurrentUser,
   persistSessionToken,
 } from "@/lib/auth";
+import { closeLotInsideTransaction } from "@/lib/lot-closing";
 import { prisma } from "@/lib/prisma";
 
 type TransactionClient = Pick<typeof prisma, "lot" | "bid" | "order">;
@@ -790,49 +791,7 @@ export async function closeLot(
 
   try {
     await prisma.$transaction(async (tx: TransactionClient) => {
-      const lot = await tx.lot.findUnique({
-        where: { slug: lotSlug },
-        include: {
-          bids: {
-            orderBy: [{ amount: "desc" }, { createdAt: "asc" }],
-            take: 1,
-          },
-        },
-      });
-
-      if (!lot) {
-        throw new Error("Lote nao encontrado.");
-      }
-
-      const winningBid = lot.bids[0];
-
-      await tx.lot.update({
-        where: { id: lot.id },
-        data: {
-          status: "closed",
-          closedAt: new Date(),
-          winnerUserId: winningBid?.userId ?? null,
-        },
-      });
-
-      if (winningBid?.userId) {
-        await tx.order.upsert({
-          where: {
-            lotId: lot.id,
-          },
-          update: {
-            userId: winningBid.userId,
-            amount: winningBid.amount,
-            status: "pending",
-          },
-          create: {
-            lotId: lot.id,
-            userId: winningBid.userId,
-            amount: winningBid.amount,
-            status: "pending",
-          },
-        });
-      }
+      await closeLotInsideTransaction(tx, lotSlug);
     });
   } catch (error) {
     return {
