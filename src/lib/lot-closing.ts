@@ -1,9 +1,5 @@
+import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-
-type TransactionClient = Omit<
-  typeof prisma,
-  "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends"
->;
 
 export async function closeExpiredLots() {
   const now = new Date();
@@ -40,7 +36,7 @@ export async function closeExpiredLots() {
 }
 
 export async function closeLotInsideTransaction(
-  tx: TransactionClient,
+  tx: Prisma.TransactionClient,
   lotSlug: string,
   closedAt = new Date(),
 ) {

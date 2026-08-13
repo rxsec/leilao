@@ -3,6 +3,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
+import type { Prisma } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -16,8 +17,6 @@ import {
 } from "@/lib/auth";
 import { closeLotInsideTransaction } from "@/lib/lot-closing";
 import { prisma } from "@/lib/prisma";
-
-type TransactionClient = Pick<typeof prisma, "lot" | "bid" | "order">;
 
 export async function subscribeToNewsletter(
   _previousState: FormState,
@@ -358,7 +357,7 @@ export async function placeBid(
   }
 
   try {
-    await prisma.$transaction(async (tx: TransactionClient) => {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const lot = await tx.lot.findUnique({ where: { slug: lotSlug } });
 
       if (!lot) {
@@ -792,7 +791,7 @@ export async function closeLot(
   }
 
   try {
-    await prisma.$transaction(async (tx: TransactionClient) => {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       await closeLotInsideTransaction(tx, lotSlug);
     });
   } catch (error) {
