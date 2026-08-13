@@ -72,7 +72,7 @@ const curatedCategoryImageBySlug: Record<string, string> = {
   terrenos: "/produtos/categorias/pelotas-terreno-condominio-sao-goncalo-19-07-2024_17-20-45-0.webp",
   imoveis: "/produtos/categorias/imsasasasaages.jpeg",
   relogios: "/catalog-featured/rolex-datejust-41-aco-e-ouro.png",
-  joias: "/produtos/categorias/imsasasasaages.jpeg",
+  joias: "/produtos/categorias/7773323-thai-style-gold-joias-pulseira-isolada-em-fundo-branco-com-espaco-de-copia-apenas-adicione-seu-proprio-texto-chines-ano-novo-presente-loja-de-ouro-negocio-gratis-foto.jpg",
   "artigos-de-luxo": "/produtos/categorias/bolsa_louis_vuitton_onthego_mm_monograma_15043_1_36a573064ecf917cabd86e751d63b9f3.webp",
 };
 
