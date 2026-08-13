@@ -106,11 +106,11 @@ export default async function LotDetailPage({
                 />
               </div>
 
-              <div className="rounded-[1.2rem] bg-[#0f1720] p-5 text-white">
-                <p className="text-xs uppercase tracking-[0.22em] text-white/55">
+              <div className="rounded-[1.2rem] border border-[#d5e0e8] bg-[#f8fbfd] p-5">
+                <p className="text-xs uppercase tracking-[0.22em] text-[#5f7f92]">
                   Lance atual
                 </p>
-                <p className="mt-2 text-[2.2rem] font-extrabold tracking-[-0.04em]">
+                <p className="mt-2 text-[2.2rem] font-extrabold tracking-[-0.04em] text-[#0f5d86]">
                   {lot.currentBid}
                 </p>
               </div>

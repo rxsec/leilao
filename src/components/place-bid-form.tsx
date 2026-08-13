@@ -67,7 +67,7 @@ export function PlaceBidForm({
         {isPending ? "Enviando lance..." : "Enviar lance"}
       </button>
 
-      <p className="text-sm text-neutral-500">
+      <p className="text-sm leading-7 text-[#5f7f92]">
         {enabled
           ? "O novo lance precisa ser maior que o valor atual e respeitar o incremento minimo."
           : "Entre na conta e finalize a configuracao operacional para liberar o envio real de lances."}
