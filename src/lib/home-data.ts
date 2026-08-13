@@ -138,7 +138,10 @@ export async function getHomeData(): Promise<HomeData> {
       price: formatCurrency(Number(lot.currentBid)),
       bids: `${lot.bidCount} ${lot.bidCount === 1 ? "lance" : "lances"}`,
       ending: formatEndsAt(lot.endsAt ? lot.endsAt.toISOString() : null),
-      image: getLotCoverImage(lot.category?.slug ?? inferCategorySlug(lot.type), lot.slug),
+      image:
+        lot.imageUrl ??
+        lot.images[0]?.url ??
+        getLotCoverImage(lot.category?.slug ?? inferCategorySlug(lot.type), lot.slug),
       categoryName: lot.category?.name ?? inferCategoryName(lot.type),
     }));
 
@@ -150,7 +153,10 @@ export async function getHomeData(): Promise<HomeData> {
       slug: lot.slug,
       title: lot.title,
       lots: 1,
-      image: getLotCoverImage(lot.category?.slug ?? inferCategorySlug(lot.type), lot.slug),
+      image:
+        lot.imageUrl ??
+        lot.images[0]?.url ??
+        getLotCoverImage(lot.category?.slug ?? inferCategorySlug(lot.type), lot.slug),
     }));
 
   return {

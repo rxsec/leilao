@@ -324,7 +324,7 @@ function SectionHeader({
         href={id ? `#${id}` : "#"}
         className={`inline-flex h-11 items-center gap-2 self-start rounded-full px-5 text-sm font-medium transition sm:self-auto ${
           darkAction
-            ? "bg-[#111111] text-white hover:bg-[#1a1a1a]"
+            ? "bg-[#0f5d86] text-white hover:brightness-95"
             : "border border-black/8 bg-white text-neutral-700 hover:border-black/15"
         }`}
       >
