@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 
 export const AUTH_COOKIE_NAME = "leilao_token";
+export const ADMIN_EMAIL = "admin@sodresantoro.com.br";
 
 type JwtPayload = {
   sub: string;
@@ -20,6 +21,15 @@ export type SessionUser = {
 };
 
 const jwtSecret = new TextEncoder().encode(process.env.JWT_SECRET || "dev-secret");
+
+export function resolveAccessRole(user: {
+  email: string;
+  role: "admin" | "customer";
+}) {
+  return user.role === "admin" && user.email.toLowerCase() === ADMIN_EMAIL
+    ? "admin"
+    : "customer";
+}
 
 export async function getSessionToken() {
   const store = await cookies();
@@ -85,7 +95,7 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
       id: user.id,
       name: user.name,
       email: user.email,
-      role: user.role,
+      role: resolveAccessRole(user),
     };
   } catch {
     return null;

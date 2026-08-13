@@ -12,6 +12,7 @@ import {
   createSessionToken,
   getCurrentUser,
   persistSessionToken,
+  resolveAccessRole,
 } from "@/lib/auth";
 import { closeLotInsideTransaction } from "@/lib/lot-closing";
 import { prisma } from "@/lib/prisma";
@@ -130,7 +131,6 @@ export async function registerUser(
   let redirectPath = "/meus-lances";
 
   try {
-    const totalUsers = await prisma.appUser.count();
     const passwordHash = await bcrypt.hash(password, 10);
     const user = await prisma.appUser.create({
       data: {
@@ -147,7 +147,7 @@ export async function registerUser(
         state,
         whatsapp,
         passwordHash,
-        role: totalUsers === 0 ? "admin" : "customer",
+        role: "customer",
       },
       select: {
         id: true,
@@ -210,16 +210,18 @@ export async function loginUser(
     return { status: "error", message: "Credenciais invalidas." };
   }
 
+  const accessRole = resolveAccessRole(user);
+
   const token = await createSessionToken({
     id: user.id,
     name: user.name,
     email: user.email,
-    role: user.role,
+    role: accessRole,
   });
 
   await persistSessionToken(token);
   revalidatePath("/");
-  redirect(getPostLoginPath(user.role));
+  redirect(getPostLoginPath(accessRole));
 }
 
 export async function requestPasswordReset(
