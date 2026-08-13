@@ -90,7 +90,7 @@ export default async function LeiloesPage({
               <input
                 name="q"
                 defaultValue={query}
-                placeholder="Ex.: imóvel, relógio, São Paulo"
+                placeholder="Ex.: iPhone, Galaxy, Xiaomi"
                 className={inputClassName}
               />
             </Field>

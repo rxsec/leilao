@@ -1,6 +1,4 @@
 import {
-  premiumLots as fallbackPremiumLots,
-  propertyLots as fallbackPropertyLots,
   spotlightCategories as fallbackSpotlightCategories,
 } from "@/lib/branding";
 import {
@@ -112,18 +110,8 @@ export async function getHomeData(): Promise<HomeData> {
   if (categories.length === 0 && lots.length === 0) {
     return {
       categories: fallbackSpotlightCategories,
-      activeLots: fallbackPropertyLots.map((lot) => ({
-        slug: lot.slug,
-        title: lot.title,
-        subtitle: lot.subtitle,
-        location: lot.location,
-        price: lot.price,
-        bids: lot.bids,
-        ending: lot.ending,
-        image: lot.image,
-        categoryName: "Imóveis",
-      })),
-      premiumLots: fallbackPremiumLots,
+      activeLots: [],
+      premiumLots: [],
       hasDatabase: false,
       usingFallbackData: true,
     };
@@ -170,21 +158,8 @@ export async function getHomeData(): Promise<HomeData> {
       spotlightCategories.length > 0
         ? spotlightCategories
         : fallbackSpotlightCategories,
-    activeLots:
-      activeLots.length > 0
-        ? activeLots
-        : fallbackPropertyLots.map((lot) => ({
-            slug: lot.slug,
-            title: lot.title,
-            subtitle: lot.subtitle,
-            location: lot.location,
-            price: lot.price,
-            bids: lot.bids,
-            ending: lot.ending,
-            image: lot.image,
-            categoryName: "Imóveis",
-          })),
-    premiumLots: premiumLots.length > 0 ? premiumLots : fallbackPremiumLots,
+    activeLots,
+    premiumLots,
     hasDatabase: true,
     usingFallbackData: false,
   };
@@ -192,7 +167,7 @@ export async function getHomeData(): Promise<HomeData> {
 
 function inferCategoryName(type: HomeLotRecord["type"]) {
   if (type === "property") {
-    return "Imóveis";
+    return "Imoveis";
   }
 
   if (type === "luxury") {
@@ -200,7 +175,7 @@ function inferCategoryName(type: HomeLotRecord["type"]) {
   }
 
   if (type === "electronics") {
-    return "Eletrônicos";
+    return "Eletronicos";
   }
 
   return "Outros";

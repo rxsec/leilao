@@ -7,8 +7,6 @@ import {
   CreditCard,
   Gavel,
   Headphones,
-  MapPin,
-  PackageCheck,
   Shield,
   Truck,
 } from "lucide-react";
@@ -91,121 +89,106 @@ export default async function Home() {
 
           {usingFallbackData ? (
             <p className="mt-4 text-sm text-neutral-500">
-              Enquanto o catálogo principal é montado, esta vitrine mostra itens
-              de referência para manter a navegação ativa.
+              As categorias seguem visíveis enquanto novos produtos são
+              organizados no catálogo.
             </p>
           ) : null}
 
-          <SectionHeader
-            id="leiloes"
-            title="Leilões ativos"
-            action="Ver todos leilões"
-            darkAction
-            className="mt-10"
-          />
-          <div className="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {activeLots.map((lot) => (
-              <Link
-                key={lot.slug}
-                href={`/leiloes/${lot.slug}`}
-                className="section-card overflow-hidden rounded-[1rem] transition hover:-translate-y-1"
-              >
-                <div className="relative h-[10.2rem] overflow-hidden sm:h-[12rem]">
-                  <Image
-                    src={lot.image}
-                    alt={lot.title}
-                    fill
-                    className="object-cover"
-                    sizes="350px"
-                  />
-                  <span className="accent-button absolute left-4 top-4 rounded-full px-3 py-1 text-[0.68rem] font-bold">
-                    {lot.categoryName}
-                  </span>
-                </div>
-                <div className="space-y-3 p-4 sm:p-5">
-                  <div>
-                    <h3 className="text-[1.35rem] font-extrabold uppercase text-neutral-950">
-                      {lot.title}
-                    </h3>
-                    <p className="mt-1 text-sm text-neutral-500">{lot.subtitle}</p>
-                  </div>
-                  <p className="flex items-center gap-2 text-sm text-neutral-500">
-                    <MapPin className="h-4 w-4" />
-                    {lot.location}
-                  </p>
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-                    <div>
-                      <p className="text-xs text-neutral-400">Lance atual</p>
-                      <p className="mt-1 text-[2rem] font-extrabold text-neutral-950">
-                        {lot.price}
-                      </p>
-                    </div>
-                    <div className="text-left text-sm text-neutral-500 sm:text-right">
-                      <p>{lot.bids}</p>
-                      <p>{lot.ending}</p>
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-
-          <SectionHeader
-            id="itens"
-            title="Outros Itens de Valor"
-            action="Ver todos itens"
-            className="mt-10"
-          />
-          <div className="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-[repeat(4,minmax(0,1fr))_0.95fr]">
-            {premiumLots.map((lot) => (
-              <Link
-                key={lot.title}
-                href={`/leiloes/${lot.slug}`}
-                className="section-card flex h-full flex-col overflow-hidden rounded-[1rem] transition hover:-translate-y-1"
-              >
-                <div className="relative h-[10.5rem] overflow-hidden sm:h-[12rem]">
-                  <Image
-                    src={lot.image}
-                    alt={lot.title}
-                    fill
-                    className="object-cover"
-                    sizes="200px"
-                  />
-                </div>
-                <div className="flex flex-1 flex-col justify-between p-4 sm:p-5">
-                  <h3 className="text-center text-[1.05rem] font-extrabold uppercase text-neutral-950">
-                    {lot.title}
-                  </h3>
-                  <div className="mt-3 flex justify-center">
-                    <span className="inline-flex items-center gap-2 rounded-full border border-[var(--brand-soft)] bg-white px-3 py-1.5 text-[0.72rem] font-medium text-neutral-500">
-                      <Gavel className="h-3 w-3 text-[var(--brand)]" />
-                      {lot.lots} Leilões ativos
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-
-            <aside className="rounded-[1rem] bg-[linear-gradient(160deg,#0b2230,#0f4f72)] p-5 text-white shadow-[0_18px_40px_rgba(15,93,134,0.18)]">
-              <div className="grid-pattern flex h-full min-h-[17rem] flex-col justify-between rounded-[0.9rem] border border-white/10 p-6 sm:min-h-[19rem]">
-                <PackageCheck className="h-11 w-11 text-[#d7eef8]" />
-                <div>
-                  <h3 className="text-[2rem] font-extrabold uppercase">
-                    Outros Itens
-                  </h3>
-                  <p className="mt-4 max-w-[15rem] text-base leading-7 text-white/82">
-                    Descubra muito mais produtos incríveis para arrematar.
-                  </p>
+          {activeLots.length > 0 ? (
+            <>
+              <SectionHeader
+                id="leiloes"
+                title="Leilões ativos"
+                action="Ver todos leilões"
+                darkAction
+                className="mt-10"
+              />
+              <div className="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                {activeLots.map((lot) => (
                   <Link
-                    href="/leiloes"
-                    className="accent-button mt-7 inline-flex h-11 items-center rounded-xl px-5 text-sm font-bold shadow-[0_10px_24px_rgba(0,0,0,0.18)] transition hover:brightness-95"
+                    key={lot.slug}
+                    href={`/leiloes/${lot.slug}`}
+                    className="section-card overflow-hidden rounded-[1rem] transition hover:-translate-y-1"
                   >
-                    Ver todos
+                    <div className="relative h-[10.2rem] overflow-hidden sm:h-[12rem]">
+                      <Image
+                        src={lot.image}
+                        alt={lot.title}
+                        fill
+                        className="object-cover"
+                        sizes="350px"
+                      />
+                      <span className="accent-button absolute left-4 top-4 rounded-full px-3 py-1 text-[0.68rem] font-bold">
+                        {lot.categoryName}
+                      </span>
+                    </div>
+                    <div className="space-y-3 p-4 sm:p-5">
+                      <div>
+                        <h3 className="text-[1.35rem] font-extrabold uppercase text-neutral-950">
+                          {lot.title}
+                        </h3>
+                        <p className="mt-1 text-sm text-neutral-500">{lot.subtitle}</p>
+                      </div>
+                      <p className="text-sm text-neutral-500">{lot.location}</p>
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                        <div>
+                          <p className="text-xs text-neutral-400">Lance atual</p>
+                          <p className="mt-1 text-[2rem] font-extrabold text-neutral-950">
+                            {lot.price}
+                          </p>
+                        </div>
+                        <div className="text-left text-sm text-neutral-500 sm:text-right">
+                          <p>{lot.bids}</p>
+                          <p>{lot.ending}</p>
+                        </div>
+                      </div>
+                    </div>
                   </Link>
-                </div>
+                ))}
               </div>
-            </aside>
-          </div>
+            </>
+          ) : null}
+
+          {premiumLots.length > 0 ? (
+            <>
+              <SectionHeader
+                id="itens"
+                title="Outros Itens de Valor"
+                action="Ver todos itens"
+                className="mt-10"
+              />
+              <div className="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-[repeat(4,minmax(0,1fr))_0.95fr]">
+                {premiumLots.map((lot) => (
+                  <Link
+                    key={lot.title}
+                    href={`/leiloes/${lot.slug}`}
+                    className="section-card flex h-full flex-col overflow-hidden rounded-[1rem] transition hover:-translate-y-1"
+                  >
+                    <div className="relative h-[10.5rem] overflow-hidden sm:h-[12rem]">
+                      <Image
+                        src={lot.image}
+                        alt={lot.title}
+                        fill
+                        className="object-cover"
+                        sizes="200px"
+                      />
+                    </div>
+                    <div className="flex flex-1 flex-col justify-between p-4 sm:p-5">
+                      <h3 className="text-center text-[1.05rem] font-extrabold uppercase text-neutral-950">
+                        {lot.title}
+                      </h3>
+                      <div className="mt-3 flex justify-center">
+                        <span className="inline-flex items-center gap-2 rounded-full border border-[var(--brand-soft)] bg-white px-3 py-1.5 text-[0.72rem] font-medium text-neutral-500">
+                          <Gavel className="h-3 w-3 text-[var(--brand)]" />
+                          {lot.lots} Leilões ativos
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </>
+          ) : null}
 
           <section
             id="como-funciona"

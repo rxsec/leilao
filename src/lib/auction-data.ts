@@ -238,9 +238,9 @@ export async function getAuctionLots(
 
   if (lots.length === 0) {
     return {
-      lots: search ? [] : buildFallbackLots(),
-      hasDatabase: false,
-      usingFallbackData: !search,
+      lots: [],
+      hasDatabase: true,
+      usingFallbackData: false,
     };
   }
 
@@ -253,13 +253,6 @@ export async function getAuctionLots(
 
 export async function getAuctionFilterOptions(): Promise<AuctionFilterOption[]> {
   const categories = await prisma.category.findMany({
-    where: {
-      lots: {
-        some: {
-          status: { in: ["live", "scheduled"] },
-        },
-      },
-    },
     orderBy: { name: "asc" },
     select: {
       slug: true,
