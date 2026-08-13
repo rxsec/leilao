@@ -4,6 +4,7 @@ import { CloseLotForm } from "@/components/close-lot-form";
 import { DeleteCategoryForm } from "@/components/delete-category-form";
 import { ResolvePasswordResetForm } from "@/components/resolve-password-reset-form";
 import {
+  type AdminCustomer,
   getAdminPanelData,
   type AdminCategory,
   type AdminLot,
@@ -13,7 +14,7 @@ import { requireAdmin } from "@/lib/auth";
 
 export default async function AdminPage() {
   await requireAdmin();
-  const { categories, lots, passwordResetRequests, hasDatabase } =
+  const { categories, customers, lots, passwordResetRequests, hasDatabase } =
     await getAdminPanelData();
 
   return (
@@ -38,6 +39,74 @@ export default async function AdminPage() {
         </div>
 
         <div className="mt-8 space-y-8">
+          <section className="section-card rounded-[1.3rem] p-6">
+            <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#0f5d86]">
+              Clientes
+            </p>
+            <h2 className="mt-3 text-[1.9rem] font-extrabold tracking-[-0.04em] text-neutral-950">
+              Cadastros realizados
+            </h2>
+            <div className="mt-5 space-y-4">
+              {customers.length > 0 ? (
+                customers.map((customer: AdminCustomer) => (
+                  <div
+                    key={customer.id}
+                    className="rounded-[1.2rem] border border-[#d5e0e8] bg-[#f9fbfd] p-4"
+                  >
+                    <div className="mb-4 flex flex-wrap items-center gap-3">
+                      <p className="text-lg font-extrabold text-neutral-950">
+                        {customer.name}
+                      </p>
+                      <span className="rounded-full bg-[#eef5fa] px-3 py-1 text-xs font-semibold uppercase text-[#0f5d86]">
+                        {customer.role}
+                      </span>
+                    </div>
+                    <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                      <MiniInfo label="E-mail" value={customer.email} />
+                      <MiniInfo label="CPF" value={customer.cpf ?? "-"} />
+                      <MiniInfo
+                        label="Nascimento"
+                        value={
+                          customer.birth_date
+                            ? formatDate(customer.birth_date)
+                            : "-"
+                        }
+                      />
+                      <MiniInfo
+                        label="WhatsApp"
+                        value={customer.whatsapp ?? "-"}
+                      />
+                      <MiniInfo label="CEP" value={customer.cep ?? "-"} />
+                      <MiniInfo label="Rua" value={customer.street ?? "-"} />
+                      <MiniInfo
+                        label="Número"
+                        value={customer.street_number ?? "-"}
+                      />
+                      <MiniInfo
+                        label="Complemento"
+                        value={customer.complement ?? "-"}
+                      />
+                      <MiniInfo
+                        label="Bairro"
+                        value={customer.neighborhood ?? "-"}
+                      />
+                      <MiniInfo label="Cidade" value={customer.city ?? "-"} />
+                      <MiniInfo label="Estado" value={customer.state ?? "-"} />
+                      <MiniInfo
+                        label="Cadastrado em"
+                        value={formatDateTime(customer.created_at)}
+                      />
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-neutral-500">
+                  Nenhum cliente cadastrado ainda.
+                </p>
+              )}
+            </div>
+          </section>
+
           <section className="section-card rounded-[1.3rem] p-6">
             <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#0f5d86]">
               Recuperação de senha
@@ -243,5 +312,12 @@ function formatDateTime(value: string) {
   return new Intl.DateTimeFormat("pt-BR", {
     dateStyle: "short",
     timeStyle: "short",
+  }).format(new Date(value));
+}
+
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "short",
+    timeZone: "UTC",
   }).format(new Date(value));
 }

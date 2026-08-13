@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Clock3, Gavel, MapPin } from "lucide-react";
+import { CountdownLabel } from "@/components/countdown-label";
 import {
   getAuctionFilterOptions,
   getAuctionLots,
@@ -211,7 +212,10 @@ export default async function LeiloesPage({
                     </p>
                     <p className="flex items-center gap-2">
                       <Clock3 className="h-4 w-4 text-[#0f5d86]" />
-                      {lot.endsAtLabel}
+                      <CountdownLabel
+                        endsAtIso={lot.endsAtIso}
+                        fallbackLabel={lot.endsAtLabel}
+                      />
                     </p>
                     <p className="flex items-center gap-2">
                       <Gavel className="h-4 w-4 text-[#0f5d86]" />

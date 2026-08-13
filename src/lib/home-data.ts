@@ -24,6 +24,7 @@ type ActiveLot = {
   price: string;
   bids: string;
   ending: string;
+  endsAtIso: string | null;
   image: string;
   categoryName: string;
 };
@@ -138,6 +139,7 @@ export async function getHomeData(): Promise<HomeData> {
       price: formatCurrency(Number(lot.currentBid)),
       bids: `${lot.bidCount} ${lot.bidCount === 1 ? "lance" : "lances"}`,
       ending: formatEndsAt(lot.endsAt ? lot.endsAt.toISOString() : null),
+      endsAtIso: lot.endsAt ? lot.endsAt.toISOString() : null,
       image:
         lot.imageUrl ??
         lot.images[0]?.url ??

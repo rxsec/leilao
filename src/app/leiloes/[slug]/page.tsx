@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Clock3, Gavel, MapPin } from "lucide-react";
 import { notFound } from "next/navigation";
+import { CountdownLabel } from "@/components/countdown-label";
 import { PlaceBidForm } from "@/components/place-bid-form";
 import {
   getLotDetail,
@@ -96,7 +97,12 @@ export default async function LotDetailPage({
                 />
                 <InfoPill
                   icon={<Clock3 className="h-4 w-4" />}
-                  label={lot.endsAtLabel}
+                  label={
+                    <CountdownLabel
+                      endsAtIso={lot.endsAtIso}
+                      fallbackLabel={lot.endsAtLabel}
+                    />
+                  }
                 />
                 <InfoPill
                   icon={<Gavel className="h-4 w-4" />}
@@ -228,7 +234,7 @@ function InfoPill({
   label,
 }: {
   icon: React.ReactNode;
-  label: string;
+  label: React.ReactNode;
 }) {
   return (
     <div className="flex items-center gap-2 rounded-xl border border-[#d5e0e8] bg-white px-4 py-3 text-sm text-neutral-600">

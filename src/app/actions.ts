@@ -60,17 +60,69 @@ export async function registerUser(
   formData: FormData,
 ): Promise<FormState> {
   const name = String(formData.get("name") ?? "").trim();
+  const birthDate = String(formData.get("birthDate") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const cpf = normalizeDigits(String(formData.get("cpf") ?? ""), 11);
+  const cep = normalizeDigits(String(formData.get("cep") ?? ""), 8);
+  const street = String(formData.get("street") ?? "").trim();
+  const streetNumber = String(formData.get("streetNumber") ?? "").trim();
+  const complement = String(formData.get("complement") ?? "").trim();
+  const neighborhood = String(formData.get("neighborhood") ?? "").trim();
+  const city = String(formData.get("city") ?? "").trim();
+  const state = String(formData.get("state") ?? "").trim().toUpperCase();
+  const whatsapp = normalizeDigits(String(formData.get("whatsapp") ?? ""), 11);
   const password = String(formData.get("password") ?? "");
 
-  if (!name || !email || !password) {
-    return { status: "error", message: "Preencha nome, e-mail e senha." };
+  if (
+    !name ||
+    !birthDate ||
+    !email ||
+    !cpf ||
+    !cep ||
+    !street ||
+    !streetNumber ||
+    !complement ||
+    !neighborhood ||
+    !city ||
+    !state ||
+    !whatsapp ||
+    !password
+  ) {
+    return { status: "error", message: "Preencha todos os campos do cadastro." };
   }
 
   if (password.length < 6) {
     return {
       status: "error",
       message: "A senha precisa ter pelo menos 6 caracteres.",
+    };
+  }
+
+  if (!isValidCpf(cpf)) {
+    return {
+      status: "error",
+      message: "Digite um CPF valido.",
+    };
+  }
+
+  if (cep.length !== 8) {
+    return {
+      status: "error",
+      message: "Digite um CEP valido.",
+    };
+  }
+
+  if (whatsapp.length < 10) {
+    return {
+      status: "error",
+      message: "Digite um WhatsApp valido.",
+    };
+  }
+
+  if (state.length !== 2) {
+    return {
+      status: "error",
+      message: "Digite um estado valido com 2 letras.",
     };
   }
 
@@ -82,7 +134,17 @@ export async function registerUser(
     const user = await prisma.appUser.create({
       data: {
         name,
+        birthDate: new Date(`${birthDate}T00:00:00.000Z`),
         email,
+        cpf,
+        cep,
+        street,
+        streetNumber,
+        complement,
+        neighborhood,
+        city,
+        state,
+        whatsapp,
         passwordHash,
         role: totalUsers === 0 ? "admin" : "customer",
       },
@@ -101,7 +163,7 @@ export async function registerUser(
     if (isUniqueConstraintError(error)) {
       return {
         status: "error",
-        message: "Ja existe uma conta com este e-mail.",
+        message: "Ja existe uma conta com este e-mail ou CPF.",
       };
     }
 
@@ -869,6 +931,27 @@ function nullableNumber(value: FormDataEntryValue | null) {
 function nullableString(value: FormDataEntryValue | null) {
   const parsed = String(value ?? "").trim();
   return parsed ? parsed : null;
+}
+
+function normalizeDigits(value: string, maxLength: number) {
+  return value.replace(/\D/g, "").slice(0, maxLength);
+}
+
+function isValidCpf(value: string) {
+  if (value.length !== 11 || /^(\d)\1+$/.test(value)) {
+    return false;
+  }
+
+  const digits = value.split("").map(Number);
+  const calculateDigit = (length: number) => {
+    const sum = digits
+      .slice(0, length)
+      .reduce((accumulator, digit, index) => accumulator + digit * (length + 1 - index), 0);
+    const remainder = (sum * 10) % 11;
+    return remainder === 10 ? 0 : remainder;
+  };
+
+  return calculateDigit(9) === digits[9] && calculateDigit(10) === digits[10];
 }
 
 function isUniqueConstraintError(error: unknown) {

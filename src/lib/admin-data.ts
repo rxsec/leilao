@@ -10,6 +10,24 @@ export type AdminCategory = {
   activeLots: number;
 };
 
+export type AdminCustomer = {
+  id: string;
+  name: string;
+  birth_date: string | null;
+  email: string;
+  cpf: string | null;
+  cep: string | null;
+  street: string | null;
+  street_number: string | null;
+  complement: string | null;
+  neighborhood: string | null;
+  city: string | null;
+  state: string | null;
+  whatsapp: string | null;
+  role: "admin" | "customer";
+  created_at: string;
+};
+
 export type AdminLot = {
   id: string;
   categoryId: string | null;
@@ -66,11 +84,30 @@ type AdminPasswordResetRecord = {
   resolvedAt: Date | null;
 };
 
+type AdminCustomerRecord = {
+  id: string;
+  name: string;
+  birthDate: Date | null;
+  email: string;
+  cpf: string | null;
+  cep: string | null;
+  street: string | null;
+  streetNumber: string | null;
+  complement: string | null;
+  neighborhood: string | null;
+  city: string | null;
+  state: string | null;
+  whatsapp: string | null;
+  role: "admin" | "customer";
+  createdAt: Date;
+};
+
 export async function getAdminPanelData() {
-  const [categories, lots, passwordResetRequests]: [
+  const [categories, lots, passwordResetRequests, customers]: [
     AdminCategory[],
     AdminLotRecord[],
     AdminPasswordResetRecord[],
+    AdminCustomerRecord[],
   ] = await Promise.all([
     prisma.category.findMany({
       orderBy: { name: "asc" },
@@ -82,6 +119,26 @@ export async function getAdminPanelData() {
     prisma.passwordResetRequest.findMany({
       orderBy: { createdAt: "desc" },
       take: 20,
+    }),
+    prisma.appUser.findMany({
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        name: true,
+        birthDate: true,
+        email: true,
+        cpf: true,
+        cep: true,
+        street: true,
+        streetNumber: true,
+        complement: true,
+        neighborhood: true,
+        city: true,
+        state: true,
+        whatsapp: true,
+        role: true,
+        createdAt: true,
+      },
     }),
   ]);
 
@@ -115,6 +172,23 @@ export async function getAdminPanelData() {
         resolved_at: request.resolvedAt ? request.resolvedAt.toISOString() : null,
       }),
     ) as AdminPasswordResetRequest[],
+    customers: customers.map((customer: AdminCustomerRecord) => ({
+      id: customer.id,
+      name: customer.name,
+      birth_date: customer.birthDate ? customer.birthDate.toISOString() : null,
+      email: customer.email,
+      cpf: customer.cpf,
+      cep: customer.cep,
+      street: customer.street,
+      street_number: customer.streetNumber,
+      complement: customer.complement,
+      neighborhood: customer.neighborhood,
+      city: customer.city,
+      state: customer.state,
+      whatsapp: customer.whatsapp,
+      role: customer.role,
+      created_at: customer.createdAt.toISOString(),
+    })) as AdminCustomer[],
     hasDatabase: true,
   };
 }

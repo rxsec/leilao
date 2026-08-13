@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { BannerCarousel } from "@/components/banner-carousel";
 import { trustItems } from "@/lib/branding";
+import { CountdownLabel } from "@/components/countdown-label";
 import { getHomeData } from "@/lib/home-data";
 
 export default async function Home() {
@@ -136,7 +137,12 @@ export default async function Home() {
                         </div>
                         <div className="text-left text-sm text-neutral-500 sm:text-right">
                           <p>{lot.bids}</p>
-                          <p>{lot.ending}</p>
+                          <p>
+                            <CountdownLabel
+                              endsAtIso={lot.endsAtIso}
+                              fallbackLabel={lot.ending}
+                            />
+                          </p>
                         </div>
                       </div>
                     </div>
