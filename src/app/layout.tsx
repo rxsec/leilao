@@ -17,6 +17,18 @@ const manrope = Manrope({
 export const metadata: Metadata = {
   title: `${siteConfig.name} | Leilões Online`,
   description: siteConfig.description,
+  applicationName: `${siteConfig.name} | Leilões Online`,
+  openGraph: {
+    title: `${siteConfig.name} | Leilões Online`,
+    description: siteConfig.description,
+    siteName: `${siteConfig.name} | Leilões Online`,
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: `${siteConfig.name} | Leilões Online`,
+    description: siteConfig.description,
+  },
   icons: {
     icon: "/favicon.webp",
     shortcut: "/favicon.webp",
