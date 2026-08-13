@@ -3,7 +3,7 @@ export const siteConfig = {
   shortName: "Sodré Santoro",
   tagline: "Leilões com tradição, escala e confiança",
   description:
-    "Plataforma de leilões online inspirada na identidade da Sodré Santoro, com imóveis, eletrônicos e itens premium.",
+    "Leilão Oficial, faça seus lances e arremate com segurança e tecnologia de ponta.",
   supportEmail: "contato@sodresantoro.com.br",
   phone: "(11) 2163-7800",
   city: "São Paulo, SP",
