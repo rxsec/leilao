@@ -11,8 +11,8 @@ export default function CadastroPage() {
           Crie sua conta
         </h1>
         <p className="mt-3 text-sm leading-7 text-neutral-600">
-          O primeiro usuario criado assume o papel de administrador para operar
-          o painel inicial do projeto.
+          Cadastre-se para participar dos leiloes, acompanhar seus lances e
+          concluir arremates com seguranca.
         </p>
         <div className="mt-6">
           <AuthForm mode="register" />

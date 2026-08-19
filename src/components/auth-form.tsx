@@ -8,8 +8,12 @@ import { loginUser, registerUser } from "@/app/actions";
 
 export function AuthForm({
   mode,
+  registrationSlug,
+  helperText,
 }: {
   mode: "login" | "register";
+  registrationSlug?: string | null;
+  helperText?: ReactNode;
 }) {
   const [cpfValue, setCpfValue] = useState("");
   const [cepValue, setCepValue] = useState("");
@@ -26,9 +30,20 @@ export function AuthForm({
 
   return (
     <form action={formAction} className="space-y-4">
+      {mode === "register" && registrationSlug ? (
+        <input type="hidden" name="registrationSlug" value={registrationSlug} />
+      ) : null}
+
       {mode === "register" ? (
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Nome completo">
+        <>
+          {helperText ? (
+            <div className="rounded-2xl border border-[#dce6ee] bg-[#f7fbfd] px-4 py-3 text-sm leading-6 text-neutral-600">
+              {helperText}
+            </div>
+          ) : null}
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Nome completo">
             <input
               type="text"
               name="name"
@@ -201,7 +216,8 @@ export function AuthForm({
               placeholder="(11) 99999-9999"
             />
           </Field>
-        </div>
+          </div>
+        </>
       ) : null}
 
       <Field label="E-mail">

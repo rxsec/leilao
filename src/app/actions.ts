@@ -13,6 +13,7 @@ import {
   createSessionToken,
   getCurrentUser,
   persistSessionToken,
+  isPrimaryAdminEmail,
   resolveAccessRole,
 } from "@/lib/auth";
 import { closeLotInsideTransaction } from "@/lib/lot-closing";
@@ -73,6 +74,7 @@ export async function registerUser(
   const state = String(formData.get("state") ?? "").trim().toUpperCase();
   const whatsapp = normalizeDigits(String(formData.get("whatsapp") ?? ""), 11);
   const password = String(formData.get("password") ?? "");
+  const registrationSlug = nullableString(formData.get("registrationSlug"));
 
   if (
     !name ||
@@ -131,6 +133,25 @@ export async function registerUser(
 
   try {
     const passwordHash = await bcrypt.hash(password, 10);
+    const ownerAdmin = registrationSlug
+      ? await prisma.appUser.findFirst({
+          where: {
+            role: "admin",
+            registrationSlug,
+          },
+          select: {
+            id: true,
+          },
+        })
+      : null;
+
+    if (registrationSlug && !ownerAdmin) {
+      return {
+        status: "error",
+        message: "O link de cadastro informado nao esta mais disponivel.",
+      };
+    }
+
     const user = await prisma.appUser.create({
       data: {
         name,
@@ -147,16 +168,21 @@ export async function registerUser(
         whatsapp,
         passwordHash,
         role: "customer",
+        managedByAdminId: ownerAdmin?.id ?? null,
       },
       select: {
         id: true,
         name: true,
         email: true,
         role: true,
+        registrationSlug: true,
       },
     });
 
-    const token = await createSessionToken(user);
+    const token = await createSessionToken({
+      ...user,
+      isPrimaryAdmin: false,
+    });
     await persistSessionToken(token);
     redirectPath = getPostLoginPath(user.role);
   } catch (error) {
@@ -196,6 +222,7 @@ export async function loginUser(
       email: true,
       role: true,
       passwordHash: true,
+      registrationSlug: true,
     },
   });
 
@@ -216,6 +243,8 @@ export async function loginUser(
     name: user.name,
     email: user.email,
     role: accessRole,
+    isPrimaryAdmin: isPrimaryAdminEmail(user.email),
+    registrationSlug: user.registrationSlug,
   });
 
   await persistSessionToken(token);

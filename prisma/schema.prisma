@@ -37,25 +37,29 @@ enum PasswordResetStatus {
 }
 
 model AppUser {
-  id             String    @id @default(uuid()) @db.Uuid
-  name           String
-  birthDate      DateTime? @map("birth_date") @db.Date
-  email          String    @unique
-  cpf            String?   @unique
-  cep            String?
-  street         String?
-  streetNumber   String?   @map("street_number")
-  complement     String?
-  neighborhood   String?
-  city           String?
-  state          String?
-  whatsapp       String?
-  passwordHash   String    @map("password_hash")
-  role           UserRole  @default(customer)
-  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
-  bids           Bid[]
-  orders         Order[]
-  wonLots        Lot[]     @relation("LotWinner")
+  id               String    @id @default(uuid()) @db.Uuid
+  name             String
+  birthDate        DateTime? @map("birth_date") @db.Date
+  email            String    @unique
+  cpf              String?   @unique
+  cep              String?
+  street           String?
+  streetNumber     String?   @map("street_number")
+  complement       String?
+  neighborhood     String?
+  city             String?
+  state            String?
+  whatsapp         String?
+  passwordHash     String    @map("password_hash")
+  role             UserRole  @default(customer)
+  registrationSlug String?   @unique @map("registration_slug")
+  managedByAdminId String?   @map("managed_by_admin_id") @db.Uuid
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  bids             Bid[]
+  orders           Order[]
+  wonLots          Lot[]     @relation("LotWinner")
+  managerAdmin     AppUser?  @relation("AdminCustomers", fields: [managedByAdminId], references: [id], onDelete: SetNull)
+  managedCustomers AppUser[] @relation("AdminCustomers")
 
   @@map("app_users")
 }
