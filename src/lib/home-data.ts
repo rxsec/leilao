@@ -28,6 +28,7 @@ type ActiveLot = {
   endsAtIso: string | null;
   image: string;
   categoryName: string;
+  status: "live" | "scheduled" | "closed";
 };
 
 type PremiumLot = {
@@ -56,6 +57,7 @@ type HomeLotRecord = {
   title: string;
   description: string | null;
   type: "property" | "electronics" | "luxury" | "other";
+  status: "draft" | "live" | "scheduled" | "closed";
   city: string | null;
   state: string | null;
   currentBid: { toString(): string };
@@ -93,7 +95,7 @@ export async function getHomeData(): Promise<HomeData> {
       take: 12,
     }),
     prisma.lot.findMany({
-      where: { status: "live" },
+      where: { status: { in: ["live", "scheduled", "closed"] } },
       orderBy: [{ isFeatured: "desc" }, { endsAt: "asc" }],
       take: 12,
       include: {
@@ -133,6 +135,7 @@ export async function getHomeData(): Promise<HomeData> {
   );
 
   const activeLots = sortLotsBySlugOrder(lots, featuredHomeLotSlugs)
+    .sort((left, right) => compareHomeLotPriority(left, right, featuredHomeLotSlugs))
     .slice(0, 6)
     .map((lot: HomeLotRecord) => ({
       slug: lot.slug,
@@ -148,6 +151,7 @@ export async function getHomeData(): Promise<HomeData> {
         lot.images[0]?.url ??
         getLotCoverImage(lot.category?.slug ?? inferCategorySlug(lot.type), lot.slug),
       categoryName: lot.category?.name ?? inferCategoryName(lot.type),
+      status: normalizeHomeLotStatus(lot.status),
     }));
 
   const premiumLots = lots
@@ -261,4 +265,39 @@ function compareLotSlugs(leftSlug: string, rightSlug: string, orderedSlugs: stri
   }
 
   return leftIndex - rightIndex;
+}
+
+function compareHomeLotPriority(
+  left: HomeLotRecord,
+  right: HomeLotRecord,
+  orderedSlugs: string[],
+) {
+  const leftStatus = normalizeHomeLotStatus(left.status);
+  const rightStatus = normalizeHomeLotStatus(right.status);
+  const leftPriority = getHomeStatusPriority(leftStatus);
+  const rightPriority = getHomeStatusPriority(rightStatus);
+
+  if (leftPriority !== rightPriority) {
+    return leftPriority - rightPriority;
+  }
+
+  return compareLotSlugs(left.slug, right.slug, orderedSlugs);
+}
+
+function getHomeStatusPriority(status: "live" | "scheduled" | "closed") {
+  if (status === "live") {
+    return 0;
+  }
+
+  if (status === "scheduled") {
+    return 1;
+  }
+
+  return 2;
+}
+
+function normalizeHomeLotStatus(
+  status: HomeLotRecord["status"],
+): "live" | "scheduled" | "closed" {
+  return status === "draft" ? "scheduled" : status;
 }

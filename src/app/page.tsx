@@ -119,6 +119,9 @@ export default async function Home() {
                       <span className="accent-button absolute left-4 top-4 rounded-full px-3 py-1 text-[0.68rem] font-bold">
                         {lot.categoryName}
                       </span>
+                      <span className="absolute right-4 top-4 rounded-full border border-[#d5e0e8] bg-white px-3 py-1 text-[0.68rem] font-bold uppercase text-neutral-700">
+                        {translateHomeLotStatus(lot.status)}
+                      </span>
                     </div>
                     <div className="space-y-3 p-4 sm:p-5">
                       <div>
@@ -274,4 +277,16 @@ function HeroMeta({
       </div>
     </div>
   );
+}
+
+function translateHomeLotStatus(status: "live" | "scheduled" | "closed") {
+  if (status === "live") {
+    return "Ao vivo";
+  }
+
+  if (status === "scheduled") {
+    return "Agendado";
+  }
+
+  return "Encerrado";
 }

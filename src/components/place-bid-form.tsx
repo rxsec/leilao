@@ -8,10 +8,12 @@ export function PlaceBidForm({
   lotSlug,
   enabled,
   minimumBid,
+  closed = false,
 }: {
   lotSlug: string;
   enabled: boolean;
   minimumBid: number;
+  closed?: boolean;
 }) {
   const [state, formAction, isPending] = useActionState(
     placeBid,
@@ -42,7 +44,7 @@ export function PlaceBidForm({
           type="text"
           inputMode="decimal"
           placeholder={`Minimo ${minimumBidLabel}`}
-          disabled={!enabled || isPending}
+          disabled={!enabled || closed || isPending}
           required
           value={displayAmount}
           onChange={(event) => {
@@ -61,14 +63,16 @@ export function PlaceBidForm({
 
       <button
         type="submit"
-        disabled={!enabled || isPending}
+        disabled={!enabled || closed || isPending}
         className="gold-button inline-flex h-12 w-full items-center justify-center rounded-xl px-5 text-sm font-bold transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isPending ? "Enviando lance..." : "Enviar lance"}
       </button>
 
       <p className="text-sm leading-7 text-[#5f7f92]">
-        {enabled
+        {closed
+          ? "Este lote foi encerrado e permanece visivel apenas para consulta."
+          : enabled
           ? "O novo lance precisa ser maior que o valor atual e respeitar o incremento minimo."
           : "Entre na conta e finalize a configuracao operacional para liberar o envio real de lances."}
       </p>

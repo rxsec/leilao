@@ -130,6 +130,7 @@ export default async function LeiloesPage({
                 <option value="">Todos</option>
                 <option value="live">Ao vivo</option>
                 <option value="scheduled">Agendado</option>
+                <option value="closed">Encerrado</option>
               </select>
             </Field>
 
@@ -192,6 +193,9 @@ export default async function LeiloesPage({
                   />
                   <span className="accent-button absolute left-4 top-4 rounded-full px-3 py-1 text-[0.7rem] font-bold uppercase">
                     {lot.categoryName}
+                  </span>
+                  <span className="absolute right-4 top-4 rounded-full border border-[#d5e0e8] bg-white px-3 py-1 text-[0.68rem] font-bold uppercase text-neutral-700">
+                    {translateLotStatus(lot.status)}
                   </span>
                 </div>
 
@@ -296,12 +300,24 @@ function isLotType(
   return ["property", "electronics", "luxury", "other"].includes(value);
 }
 
-function isLotStatus(value: string): value is "live" | "scheduled" {
-  return ["live", "scheduled"].includes(value);
+function isLotStatus(value: string): value is "live" | "scheduled" | "closed" {
+  return ["live", "scheduled", "closed"].includes(value);
 }
 
 function isSortOption(
   value: string,
 ): value is "ending" | "price-asc" | "price-desc" | "recent" {
   return ["ending", "price-asc", "price-desc", "recent"].includes(value);
+}
+
+function translateLotStatus(status: AuctionLot["status"]) {
+  if (status === "live") {
+    return "Ao vivo";
+  }
+
+  if (status === "scheduled") {
+    return "Agendado";
+  }
+
+  return "Encerrado";
 }

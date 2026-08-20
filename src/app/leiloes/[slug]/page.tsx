@@ -138,7 +138,8 @@ export default async function LotDetailPage({
               <div className="mt-5">
                 <PlaceBidForm
                   lotSlug={lot.slug}
-                  enabled={hasDatabase}
+                  enabled={hasDatabase && lot.status === "live"}
+                  closed={lot.status === "closed"}
                   minimumBid={lot.currentBidValue}
                 />
               </div>

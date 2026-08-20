@@ -63,7 +63,7 @@ type GetAuctionLotsOptions = {
   search?: string;
   category?: string;
   type?: LotType | "";
-  status?: "live" | "scheduled" | "";
+  status?: "live" | "scheduled" | "closed" | "";
   minPrice?: number | null;
   maxPrice?: number | null;
   sort?: "ending" | "price-asc" | "price-desc" | "recent";
@@ -191,9 +191,13 @@ export async function getAuctionLots(
   const minPrice = options?.minPrice ?? null;
   const maxPrice = options?.maxPrice ?? null;
   const sort = options?.sort ?? "ending";
-  const defaultStatuses: Array<"live" | "scheduled"> = ["live", "scheduled"];
+  const defaultStatuses: Array<"live" | "scheduled" | "closed"> = [
+    "live",
+    "scheduled",
+    "closed",
+  ];
   const statusFilter = status
-    ? { status: status as "live" | "scheduled" }
+    ? { status: status as "live" | "scheduled" | "closed" }
     : { status: { in: defaultStatuses } };
   const typeFilter = type ? { type } : {};
   const lots = await prisma.lot.findMany({
@@ -248,7 +252,7 @@ export async function getAuctionLots(
   }
 
   return {
-    lots: lots.map((lot) => mapLotRecord(lot)),
+    lots: lots.map((lot) => mapLotRecord(lot)).sort(compareVisibleLots),
     hasDatabase: true,
     usingFallbackData: false,
   };
@@ -491,6 +495,32 @@ function resolveLotOrder(sort: GetAuctionLotsOptions["sort"]) {
     default:
       return [{ isFeatured: "desc" as const }, { endsAt: "asc" as const }];
   }
+}
+
+function compareVisibleLots(left: AuctionLot, right: AuctionLot) {
+  const leftPriority = getStatusPriority(left.status);
+  const rightPriority = getStatusPriority(right.status);
+
+  if (leftPriority !== rightPriority) {
+    return leftPriority - rightPriority;
+  }
+
+  const leftEndsAt = left.endsAtIso ? new Date(left.endsAtIso).getTime() : Number.MAX_SAFE_INTEGER;
+  const rightEndsAt = right.endsAtIso ? new Date(right.endsAtIso).getTime() : Number.MAX_SAFE_INTEGER;
+
+  return leftEndsAt - rightEndsAt;
+}
+
+function getStatusPriority(status: LotStatus) {
+  if (status === "live") {
+    return 0;
+  }
+
+  if (status === "scheduled") {
+    return 1;
+  }
+
+  return 2;
 }
 
 function formatCurrency(value: number) {
