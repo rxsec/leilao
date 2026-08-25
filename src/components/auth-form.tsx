@@ -22,6 +22,7 @@ export function AuthForm({
   const [city, setCity] = useState("");
   const [stateValue, setStateValue] = useState("");
   const [whatsappValue, setWhatsappValue] = useState("");
+  const [clientError, setClientError] = useState("");
   const action = mode === "login" ? loginUser : registerUser;
   const [state, formAction, isPending] = useActionState(
     action,
@@ -29,7 +30,61 @@ export function AuthForm({
   );
 
   return (
-    <form action={formAction} className="space-y-4">
+    <form
+      action={formAction}
+      className="space-y-4"
+      onSubmit={(event) => {
+        if (mode !== "register") {
+          setClientError("");
+          return;
+        }
+
+        const form = event.currentTarget;
+        const formData = new FormData(form);
+        const requiredFields = [
+          "name",
+          "birthDate",
+          "email",
+          "cpf",
+          "cep",
+          "street",
+          "streetNumber",
+          "complement",
+          "neighborhood",
+          "city",
+          "state",
+          "whatsapp",
+          "password",
+        ];
+
+        const hasEmptyField = requiredFields.some((fieldName) => {
+          const value = String(formData.get(fieldName) ?? "").trim();
+          return value.length === 0;
+        });
+
+        const cpfDigits = String(formData.get("cpf") ?? "").replace(/\D/g, "");
+        const cepDigits = String(formData.get("cep") ?? "").replace(/\D/g, "");
+        const whatsappDigits = String(formData.get("whatsapp") ?? "").replace(
+          /\D/g,
+          "",
+        );
+        const stateDigits = String(formData.get("state") ?? "").trim();
+
+        if (
+          hasEmptyField ||
+          cpfDigits.length !== 11 ||
+          cepDigits.length !== 8 ||
+          whatsappDigits.length < 10 ||
+          stateDigits.length !== 2
+        ) {
+          event.preventDefault();
+          setClientError("Preencha todos os dados obrigatorios para concluir o cadastro.");
+          return;
+        }
+
+        setClientError("");
+      }}
+    >
       {mode === "register" && registrationSlug ? (
         <input type="hidden" name="registrationSlug" value={registrationSlug} />
       ) : null}
@@ -277,6 +332,8 @@ export function AuthForm({
           {state.message}
         </p>
       ) : null}
+
+      {clientError ? <p className="text-sm text-[#9a4d00]">{clientError}</p> : null}
 
       <p className="text-sm text-neutral-500">
         {mode === "login" ? "Ainda não tem conta?" : "Já tem conta?"}{" "}
