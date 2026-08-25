@@ -23,6 +23,7 @@ type ActiveLot = {
   subtitle: string;
   location: string;
   price: string;
+  bidCount: number;
   bids: string;
   ending: string;
   endsAtIso: string | null;
@@ -143,6 +144,7 @@ export async function getHomeData(): Promise<HomeData> {
       subtitle: lot.description ?? "Oportunidade em leilao",
       location: [lot.city, lot.state].filter(Boolean).join(", ") || "Brasil",
       price: formatCurrency(Number(lot.currentBid)),
+      bidCount: lot.bidCount,
       bids: `${lot.bidCount} ${lot.bidCount === 1 ? "lance" : "lances"}`,
       ending: formatEndsAt(lot.endsAt ? lot.endsAt.toISOString() : null),
       endsAtIso: lot.endsAt ? lot.endsAt.toISOString() : null,

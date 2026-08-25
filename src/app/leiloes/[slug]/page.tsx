@@ -99,12 +99,14 @@ export default async function LotDetailPage({
                   icon={<Clock3 className="h-4 w-4" />}
                   label={<CountdownLabel status={lot.status} />}
                 />
-                <InfoPill
-                  icon={<Gavel className="h-4 w-4" />}
-                  label={`${lot.bidCount} ${
-                    lot.bidCount === 1 ? "lance" : "lances"
-                  }`}
-                />
+                {lot.bidCount > 0 ? (
+                  <InfoPill
+                    icon={<Gavel className="h-4 w-4" />}
+                    label={`${lot.bidCount} ${
+                      lot.bidCount === 1 ? "lance" : "lances"
+                    }`}
+                  />
+                ) : null}
               </div>
 
               <div className="rounded-[1.2rem] border border-[#d5e0e8] bg-[#f8fbfd] p-5">

@@ -218,10 +218,12 @@ export default async function LeiloesPage({
                       <Clock3 className="h-4 w-4 text-[#0f5d86]" />
                       <CountdownLabel status={lot.status} />
                     </p>
-                    <p className="flex items-center gap-2">
-                      <Gavel className="h-4 w-4 text-[#0f5d86]" />
-                      {lot.bidCount} {lot.bidCount === 1 ? "lance" : "lances"}
-                    </p>
+                    {lot.bidCount > 0 ? (
+                      <p className="flex items-center gap-2">
+                        <Gavel className="h-4 w-4 text-[#0f5d86]" />
+                        {lot.bidCount} {lot.bidCount === 1 ? "lance" : "lances"}
+                      </p>
+                    ) : null}
                   </div>
 
                   <div className="flex items-end justify-between gap-4">

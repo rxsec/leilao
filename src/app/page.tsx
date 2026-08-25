@@ -139,7 +139,7 @@ export default async function Home() {
                           </p>
                         </div>
                         <div className="text-left text-sm text-neutral-500 sm:text-right">
-                          <p>{lot.bids}</p>
+                          {lot.bidCount > 0 ? <p>{lot.bids}</p> : null}
                           <p>
                             <CountdownLabel status={lot.status} />
                           </p>
