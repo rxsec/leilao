@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState, useMemo, useState } from "react";
 import { initialFormState } from "@/app/action-states";
 import { placeBid } from "@/app/actions";
@@ -9,11 +10,13 @@ export function PlaceBidForm({
   enabled,
   minimumBid,
   closed = false,
+  signedIn,
 }: {
   lotSlug: string;
   enabled: boolean;
   minimumBid: number;
   closed?: boolean;
+  signedIn: boolean;
 }) {
   const [state, formAction, isPending] = useActionState(
     placeBid,
@@ -44,7 +47,7 @@ export function PlaceBidForm({
           type="text"
           inputMode="decimal"
           placeholder={`Minimo ${minimumBidLabel}`}
-          disabled={!enabled || closed || isPending}
+          disabled={!enabled || closed || isPending || !signedIn}
           required
           value={displayAmount}
           onChange={(event) => {
@@ -63,7 +66,7 @@ export function PlaceBidForm({
 
       <button
         type="submit"
-        disabled={!enabled || closed || isPending}
+        disabled={!enabled || closed || isPending || !signedIn}
         className="gold-button inline-flex h-12 w-full items-center justify-center rounded-xl px-5 text-sm font-bold transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isPending ? "Enviando lance..." : "Enviar lance"}
@@ -72,10 +75,29 @@ export function PlaceBidForm({
       <p className="text-sm leading-7 text-[#5f7f92]">
         {closed
           ? "Este lote foi encerrado e permanece visivel apenas para consulta."
+          : !signedIn
+          ? "Cadastre-se ou entre na sua conta para liberar o envio de lances."
           : enabled
           ? "O novo lance precisa ser maior que o valor atual e respeitar o incremento minimo."
           : "Entre na conta e finalize a configuracao operacional para liberar o envio real de lances."}
       </p>
+
+      {!signedIn ? (
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/cadastro"
+            className="inline-flex h-11 items-center justify-center rounded-xl bg-[#0f5d86] px-5 text-sm font-semibold text-white transition hover:bg-[#0c4f72]"
+          >
+            Criar cadastro
+          </Link>
+          <Link
+            href="/entrar"
+            className="inline-flex h-11 items-center justify-center rounded-xl border border-[#d5e0e8] bg-white px-5 text-sm font-semibold text-neutral-800 transition hover:bg-[#f4f8fb]"
+          >
+            Entrar
+          </Link>
+        </div>
+      ) : null}
 
       {state.status !== "idle" ? (
         <p

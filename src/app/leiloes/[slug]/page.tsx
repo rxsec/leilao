@@ -4,6 +4,7 @@ import { Clock3, Gavel, MapPin } from "lucide-react";
 import { notFound } from "next/navigation";
 import { CountdownLabel } from "@/components/countdown-label";
 import { PlaceBidForm } from "@/components/place-bid-form";
+import { getCurrentUser } from "@/lib/auth";
 import {
   getLotDetail,
   type AuctionLot,
@@ -16,7 +17,10 @@ export default async function LotDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const detail = await getLotDetail(slug);
+  const [detail, currentUser] = await Promise.all([
+    getLotDetail(slug),
+    getCurrentUser(),
+  ]);
 
   if (!detail) {
     notFound();
@@ -138,6 +142,7 @@ export default async function LotDetailPage({
                   enabled={hasDatabase && lot.status === "live"}
                   closed={lot.status === "closed"}
                   minimumBid={lot.currentBidValue}
+                  signedIn={Boolean(currentUser)}
                 />
               </div>
             </div>
