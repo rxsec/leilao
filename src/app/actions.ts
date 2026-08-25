@@ -810,6 +810,64 @@ export async function closeLot(
   return { status: "success", message: "Lote encerrado com sucesso." };
 }
 
+export async function resetLots(
+  _previousState: FormState,
+  _formData: FormData,
+): Promise<FormState> {
+  const user = await getCurrentUser();
+
+  if (!user || user.role !== "admin" || !user.isPrimaryAdmin) {
+    return { status: "error", message: "Acesso restrito ao admin geral." };
+  }
+
+  try {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+      const lots = await tx.lot.findMany({
+        select: {
+          id: true,
+          currentBid: true,
+          reservePrice: true,
+          bidCount: true,
+        },
+      });
+
+      await tx.bid.deleteMany();
+      await tx.order.deleteMany();
+
+      for (const lot of lots) {
+        await tx.lot.update({
+          where: { id: lot.id },
+          data: {
+            status: "live",
+            closedAt: null,
+            winnerUserId: null,
+            bidCount: 0,
+            currentBid: lot.reservePrice ?? lot.currentBid,
+            endsAt: null,
+          },
+        });
+      }
+    });
+
+    await recalculateCategoryCounts();
+  } catch {
+    return {
+      status: "error",
+      message: "Nao foi possivel zerar os lotes agora.",
+    };
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/");
+  revalidatePath("/leiloes");
+  revalidatePath("/meus-lances");
+
+  return {
+    status: "success",
+    message: "Todos os lotes foram reabertos e os lances foram zerados.",
+  };
+}
+
 export async function payOrder(
   _previousState: FormState,
   formData: FormData,

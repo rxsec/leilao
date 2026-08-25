@@ -2,6 +2,7 @@ import { AdminCategoryForm } from "@/components/admin-category-form";
 import { AdminLotForm } from "@/components/admin-lot-form";
 import { CloseLotForm } from "@/components/close-lot-form";
 import { DeleteCategoryForm } from "@/components/delete-category-form";
+import { ResetLotsForm } from "@/components/reset-lots-form";
 import { ResolvePasswordResetForm } from "@/components/resolve-password-reset-form";
 import {
   type AdminCustomer,
@@ -125,6 +126,25 @@ export default async function AdminPage({
             </div>
           </div>
         </section>
+
+        {adminUser.isPrimaryAdmin ? (
+          <section className="section-card mt-6 rounded-[1.35rem] border border-[#dbe7ef] p-5">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#0f5d86]">
+                  Operação central
+                </p>
+                <h2 className="mt-2 text-[1.55rem] font-extrabold tracking-[-0.04em] text-neutral-950">
+                  Reset geral dos lotes
+                </h2>
+                <p className="mt-2 max-w-[42rem] text-sm text-neutral-600">
+                  Use este comando apenas quando quiser reabrir todos os lotes, limpar os lances registrados e reiniciar a operação global.
+                </p>
+              </div>
+              <ResetLotsForm />
+            </div>
+          </section>
+        ) : null}
 
         <div className="mt-8 space-y-8">
           <section
