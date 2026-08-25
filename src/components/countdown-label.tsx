@@ -1,7 +1,7 @@
 export function CountdownLabel({
   status,
 }: {
-  status: "live" | "scheduled" | "closed";
+  status: "draft" | "live" | "scheduled" | "closed";
 }) {
   return <>{status === "closed" ? "Encerrado" : "Disponivel para lances"}</>;
 }
