@@ -2,37 +2,7 @@ import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
 export async function closeExpiredLots() {
-  const now = new Date();
-  const expiredLots = await prisma.lot.findMany({
-    where: {
-      status: "live",
-      endsAt: {
-        lte: now,
-      },
-    },
-    select: {
-      id: true,
-      slug: true,
-    },
-  });
-
-  if (expiredLots.length === 0) {
-    return [];
-  }
-
-  const closedSlugs: string[] = [];
-
-  for (const expiredLot of expiredLots) {
-    const closedSlug = await prisma.$transaction(async (tx) =>
-      closeLotInsideTransaction(tx, expiredLot.slug, now),
-    );
-
-    if (closedSlug) {
-      closedSlugs.push(closedSlug);
-    }
-  }
-
-  return closedSlugs;
+  return [];
 }
 
 export async function closeLotInsideTransaction(

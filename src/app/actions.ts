@@ -397,19 +397,12 @@ export async function placeBid(
         throw new Error("Este lote nao esta recebendo lances.");
       }
 
-      if (lot.endsAt && lot.endsAt.getTime() <= Date.now()) {
-        throw new Error("Este lote ja foi encerrado.");
-      }
-
       const currentBid = Number(lot.currentBid);
       const minIncrement = Number(lot.minIncrement);
 
       if (amount < currentBid + minIncrement) {
         throw new Error("O lance precisa respeitar o incremento minimo.");
       }
-
-      const shouldClose =
-        lot.buyNowPrice !== null && amount >= Number(lot.buyNowPrice);
 
       await tx.bid.create({
         data: {
@@ -426,29 +419,8 @@ export async function placeBid(
           currentBid: amount,
           bidCount: { increment: 1 },
           winnerUserId: user.id,
-          status: shouldClose ? "closed" : lot.status,
-          closedAt: shouldClose ? new Date() : lot.closedAt,
         },
       });
-
-      if (shouldClose) {
-        await tx.order.upsert({
-          where: {
-            lotId: lot.id,
-          },
-          update: {
-            userId: user.id,
-            amount,
-            status: "pending",
-          },
-          create: {
-            lotId: lot.id,
-            userId: user.id,
-            amount,
-            status: "pending",
-          },
-        });
-      }
     });
   } catch (error) {
     return {

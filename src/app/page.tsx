@@ -141,10 +141,7 @@ export default async function Home() {
                         <div className="text-left text-sm text-neutral-500 sm:text-right">
                           <p>{lot.bids}</p>
                           <p>
-                            <CountdownLabel
-                              endsAtIso={lot.endsAtIso}
-                              fallbackLabel={lot.ending}
-                            />
+                            <CountdownLabel status={lot.status} />
                           </p>
                         </div>
                       </div>

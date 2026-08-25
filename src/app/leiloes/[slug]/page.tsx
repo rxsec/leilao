@@ -97,12 +97,7 @@ export default async function LotDetailPage({
                 />
                 <InfoPill
                   icon={<Clock3 className="h-4 w-4" />}
-                  label={
-                    <CountdownLabel
-                      endsAtIso={lot.endsAtIso}
-                      fallbackLabel={lot.endsAtLabel}
-                    />
-                  }
+                  label={<CountdownLabel status={lot.status} />}
                 />
                 <InfoPill
                   icon={<Gavel className="h-4 w-4" />}
@@ -160,8 +155,8 @@ export default async function LotDetailPage({
                       className="rounded-xl border border-[#d5e0e8] bg-white px-4 py-3"
                     >
                       <div className="flex items-center justify-between gap-3">
-                        <p className="font-semibold text-neutral-950">
-                          {bid.bidderName}
+                        <p className="text-sm font-medium text-neutral-500">
+                          Lance registrado
                         </p>
                         <p className="font-extrabold text-[#0f5d86]">
                           {bid.amount}

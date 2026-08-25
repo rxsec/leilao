@@ -34,7 +34,6 @@ export type AuctionLot = {
 
 export type BidHistoryItem = {
   id: string;
-  bidderName: string;
   amount: string;
   amountValue: number;
   createdAtLabel: string;
@@ -324,7 +323,6 @@ export async function getLotDetail(slug: string): Promise<LotDetail | null> {
     lot: mappedLot,
     bidHistory: lot.bids.map((bid) => ({
       id: bid.id,
-      bidderName: bid.bidderName,
       amount: formatCurrency(Number(bid.amount)),
       amountValue: Number(bid.amount),
       createdAtLabel: formatDateTime(bid.createdAt),
@@ -383,14 +381,12 @@ function buildFallbackDetail(slug: string): LotDetail | null {
     bidHistory: [
       {
         id: `${slug}-1`,
-        bidderName: "Participante A",
         amount: formatCurrency(lot.currentBidValue),
         amountValue: lot.currentBidValue,
         createdAtLabel: "Agora mesmo",
       },
       {
         id: `${slug}-2`,
-        bidderName: "Participante B",
         amount: formatCurrency(Math.max(lot.currentBidValue - 500, 100)),
         amountValue: Math.max(lot.currentBidValue - 500, 100),
         createdAtLabel: "Ha 2 horas",

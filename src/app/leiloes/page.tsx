@@ -216,10 +216,7 @@ export default async function LeiloesPage({
                     </p>
                     <p className="flex items-center gap-2">
                       <Clock3 className="h-4 w-4 text-[#0f5d86]" />
-                      <CountdownLabel
-                        endsAtIso={lot.endsAtIso}
-                        fallbackLabel={lot.endsAtLabel}
-                      />
+                      <CountdownLabel status={lot.status} />
                     </p>
                     <p className="flex items-center gap-2">
                       <Gavel className="h-4 w-4 text-[#0f5d86]" />
